@@ -6,6 +6,7 @@ export const diceSides = [4, 6, 8, 12, 20] as const;
 
 export type Stage<T> = {
   run: (value: T, seconds: number, signal?: AbortSignal) => Promise<void>;
+  canvas?: () => HTMLCanvasElement | null;
 };
 
 export const STOP_MS = 500;

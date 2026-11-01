@@ -1,5 +1,5 @@
 import { Box, Stack, ToggleButton, ToggleButtonGroup, useTheme } from '@mui/material';
-import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import type { PointerEvent, Ref } from 'react';
 import { messages } from '../i18n/messages';
 import { useMessages } from '../i18n/react';
@@ -47,7 +47,7 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
   const orientation = useRef<Quat>(restingRotation(solidFor(sides), sides));
   const frame = useRef(0);
   const drag = useRef<{ x: number; y: number; moved: number } | null>(null);
-  const [rolled, setRolled] = useState<number | null>(null);
+  const rolled = useRef<number | null>(null);
   const color = theme.palette.primary.main;
   const ink = theme.palette.primary.contrastText;
   const dark = theme.palette.mode === 'dark';
@@ -94,9 +94,9 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
     ctx.lineJoin = 'round';
     for (const { face, normal } of visible) {
       const light = 0.5 + 0.62 * Math.max(0, dot(normal, LIGHT));
-      const muted = rolled !== null && face.value !== rolled;
+      const muted = rolled.current !== null && face.value !== rolled.current;
       outline(face.points);
-      if (face.value === rolled) ctx.fillStyle = color;
+      if (face.value === rolled.current) ctx.fillStyle = color;
       else ctx.fillStyle = shade(muted ? (dark ? '#4a4c56' : '#c4c5cc') : color, light);
       ctx.fill();
       ctx.lineWidth = Math.max(1.5, size * 0.008);
@@ -104,7 +104,7 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
       ctx.stroke();
     }
 
-    const winner = visible.find(({ face }) => face.value === rolled);
+    const winner = visible.find(({ face }) => face.value === rolled.current);
     if (winner) {
       outline(winner.face.points);
       ctx.lineWidth = Math.max(3, size * 0.016);
@@ -132,13 +132,13 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
         ratio * x,
         ratio * y,
       );
-      const muted = rolled !== null && face.value !== rolled;
+      const muted = rolled.current !== null && face.value !== rolled.current;
       if (muted) ctx.fillStyle = dark ? 'rgba(255,255,255,0.45)' : 'rgba(23,24,28,0.4)';
       else ctx.fillStyle = ink;
       const marked = sides > 6 && (face.value === 6 || face.value === 9);
       ctx.fillText(marked ? `${face.value}.` : `${face.value}`, 0, 2);
     }
-  }, [color, dark, ink, rolled, sides]);
+  }, [color, dark, ink, sides]);
 
   useEffect(() => {
     draw();
@@ -172,7 +172,7 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
       axisAngle(normalize([dy, dx, 0]), distance * DRAG_SPEED),
       orientation.current,
     );
-    setRolled(null);
+    rolled.current = null;
     draw();
   };
 
@@ -185,13 +185,15 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
   useImperativeHandle(
     ref,
     () => ({
+      canvas: () => canvasRef.current,
       run: (value, seconds, signal) =>
         new Promise((resolve) => {
           const end = restingRotation(solidFor(sides), value);
-          setRolled(null);
+          rolled.current = null;
           if (seconds <= 0) {
             orientation.current = end;
-            setRolled(value);
+            rolled.current = value;
+            draw();
             resolve();
             return;
           }
@@ -218,7 +220,8 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
               frame.current = requestAnimationFrame(step);
               return;
             }
-            setRolled(value);
+            rolled.current = value;
+            draw();
             resolve();
           };
           frame.current = requestAnimationFrame(step);

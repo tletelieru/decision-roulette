@@ -12,6 +12,7 @@ import { pickMany, pickWeightedIndex, randomInt } from '../lib/random';
 import { defaultSettings, isSettings, restoreSettings } from '../lib/settings';
 import type { Settings } from '../lib/settings';
 import { decodeShare, encodeShare } from '../lib/share';
+import type { ResultArt } from '../lib/resultImage';
 import type { SharedState } from '../lib/share';
 import { load, save } from '../lib/storage';
 import Cards from './Cards';
@@ -40,7 +41,7 @@ const SETTINGS_KEY = 'dr-settings';
 
 const NUMBER_COLOR = '#6d4fe0';
 
-type Result = { lines: string[]; color: string };
+type Result = { lines: string[]; color: string; art?: ResultArt };
 
 export default function Roulette() {
   const t = useMessages(messages);
@@ -177,12 +178,21 @@ export default function Roulette() {
     if (mode === 'coin') {
       const side = randomInt(2);
       await coin.current?.run(side, seconds, signal);
-      return { lines: [coinLabels[side]], color: COIN_COLORS[side] };
+      return {
+        lines: [coinLabels[side]],
+        color: COIN_COLORS[side],
+        art: { kind: 'coin', label: coinLabels[side], color: COIN_COLORS[side] },
+      };
     }
     if (mode === 'dice') {
       const value = randomInt(settings.sides) + 1;
       await dice.current?.run(value, seconds, signal);
-      return { lines: [`${value}`], color: NUMBER_COLOR };
+      const canvas = dice.current?.canvas?.();
+      return {
+        lines: [`${value}`],
+        color: NUMBER_COLOR,
+        art: canvas ? { kind: 'dice', canvas } : undefined,
+      };
     }
     if (mode === 'raffle') {
       const picks = pickMany(weights, winners);
@@ -196,7 +206,17 @@ export default function Roulette() {
     if (mode === 'cards') await cards.current?.run(index, seconds, signal);
     else if (mode === 'oracle') await oracle.current?.run(index, seconds, signal);
     else await wheel.current?.spin(index, seconds, signal, direction);
-    return { lines: [active[index].label], color: sliceColor(index, active.length) };
+    const { label } = active[index];
+    const canvas = wheel.current?.canvas();
+    const art: ResultArt | undefined =
+      mode === 'cards'
+        ? { kind: 'card', label }
+        : mode === 'oracle'
+          ? { kind: 'orb', label }
+          : canvas
+            ? { kind: 'wheel', canvas }
+            : undefined;
+    return { lines: [label], color: sliceColor(index, active.length), art };
   };
 
   const stop = () => {
@@ -320,6 +340,7 @@ export default function Roulette() {
         {result && (
           <ResultActions
             card={{
+              art: result.art,
               appName: t.appName,
               mode: t.modes[mode],
               winner: t.roulette.winner,

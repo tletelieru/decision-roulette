@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { confettiPieces, resultText } from './resultImage';
+import { confettiPieces, resultText, wrapWords } from './resultImage';
 
 describe('confettiPieces', () => {
   it('keeps every piece on the card and off the background color', () => {
@@ -10,6 +10,19 @@ describe('confettiPieces', () => {
       expect(piece.y).toBeLessThan(630);
       expect(piece.color).not.toBe('#d9402f');
     }
+  });
+});
+
+describe('wrapWords', () => {
+  it('breaks text at the width limit', () => {
+    expect(wrapWords('Pregunta otra vez', (line) => line.length <= 8)).toEqual([
+      'Pregunta',
+      'otra vez',
+    ]);
+  });
+
+  it('keeps a single long word whole', () => {
+    expect(wrapWords('Definitivamente', () => false)).toEqual(['Definitivamente']);
   });
 });
 

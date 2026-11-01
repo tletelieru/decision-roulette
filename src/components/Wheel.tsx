@@ -22,6 +22,7 @@ export type WheelHandle = {
     signal?: AbortSignal,
     direction?: number,
   ) => Promise<void>;
+  canvas: () => HTMLCanvasElement | null;
 };
 
 type Props = {
@@ -180,6 +181,7 @@ export default function Wheel({
   useImperativeHandle(
     ref,
     () => ({
+      canvas: () => canvasRef.current,
       spin: (index, seconds, signal, direction = 1) =>
         new Promise((resolve) => {
           const slice = slices[index];
