@@ -60,6 +60,7 @@ export default function Wheel({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerRef = useRef<SVGSVGElement>(null);
   const rotation = useRef(0);
+  const labelRotation = useRef(0);
   const frame = useRef(0);
   const drag = useRef<{ last: number; moved: number } | null>(null);
   const slices = useMemo(() => buildSlices(options.map((option) => option.weight)), [options]);
@@ -110,7 +111,8 @@ export default function Wheel({
       ctx.save();
       ctx.translate(center, center);
       const middle = (start + end) / 2;
-      const flipped = Math.cos(middle) < 0;
+      const midTurn = (slice.start + slice.end) / 2;
+      const flipped = Math.cos(toRadians(midTurn + labelRotation.current)) < 0;
       ctx.rotate(flipped ? middle + Math.PI : middle);
       ctx.font = `600 ${font}px Inter, ui-sans-serif, system-ui, sans-serif`;
       ctx.textAlign = flipped ? 'left' : 'right';
@@ -185,6 +187,7 @@ export default function Wheel({
           const from = rotation.current;
           if (seconds <= 0) {
             rotation.current = spinTarget(from, landing, 1);
+            labelRotation.current = rotation.current;
             draw();
             resolve();
             return;
@@ -192,6 +195,7 @@ export default function Wheel({
           const turns = Math.max(3, Math.round(seconds * 1.4));
           const to = spinTarget(from, landing, turns, direction);
           const overshoot = overshootFor(slice) * direction;
+          labelRotation.current = to;
           const progressAt = stoppableProgress(seconds * 1000, signal, performance.now());
           let current = sliceAt(from, slices);
           const step = (now: number) => {
