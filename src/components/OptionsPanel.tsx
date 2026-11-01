@@ -24,7 +24,6 @@ import { sliceColor } from '../lib/palette';
 import { CloseIcon, PlusIcon } from './icons';
 
 type Props = {
-  title: string;
   options: Option[];
   presets: Preset[];
   showWeights: boolean;
@@ -34,7 +33,6 @@ type Props = {
 };
 
 export default function OptionsPanel({
-  title,
   options,
   presets,
   showWeights,
@@ -96,7 +94,7 @@ export default function OptionsPanel({
       <Stack spacing={1.5}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="h6" component="h2">
-            {title}
+            {t.title}
           </Typography>
           <FormControlLabel
             sx={{ mr: 0 }}

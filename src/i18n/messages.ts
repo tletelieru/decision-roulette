@@ -21,7 +21,6 @@ type Strings = {
   };
   options: {
     title: string;
-    raffleTitle: string;
     option: string;
     weights: string;
     remove: string;
@@ -92,7 +91,6 @@ export const messages = defineMessages<Strings>({
     },
     options: {
       title: 'Options',
-      raffleTitle: 'Participants',
       option: 'Option',
       weights: 'Weights',
       remove: 'Remove',
@@ -174,7 +172,6 @@ export const messages = defineMessages<Strings>({
     },
     options: {
       title: 'Opciones',
-      raffleTitle: 'Participantes',
       option: 'Opción',
       weights: 'Pesos',
       remove: 'Quitar',

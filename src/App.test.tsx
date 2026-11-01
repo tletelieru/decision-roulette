@@ -123,7 +123,7 @@ describe('App', () => {
   it('keeps a separate list for the raffle', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));
-    expect(screen.getByRole('heading', { name: 'Participants' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Options' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Remove Ana' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Remove Ana' }));
     fireEvent.click(screen.getByRole('button', { name: 'Wheel' }));

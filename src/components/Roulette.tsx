@@ -242,7 +242,6 @@ export default function Roulette() {
           />
         ) : mode === 'dice' ? null : (
           <OptionsPanel
-            title={mode === 'raffle' ? t.options.raffleTitle : t.options.title}
             options={list}
             presets={presets}
             showWeights={settings.showWeights}
