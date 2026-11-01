@@ -30,6 +30,35 @@ describe('App', () => {
     expect(document.documentElement.lang).toBe('es');
   });
 
+  it('spins to a result with instant mode', async () => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 5,
+        instant: true,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Spin the wheel' }));
+    expect(await screen.findByText('The wheel says')).toBeTruthy();
+  });
+
+  it('adds options and blocks spinning with fewer than two', () => {
+    localStorage.setItem('dr-options', '[]');
+    render(<App />);
+    expect(screen.getByText('Add at least two options to spin.')).toBeTruthy();
+    const input = screen.getByRole('textbox', { name: 'Add an option' });
+    for (const label of ['Yes', 'No']) {
+      fireEvent.change(input, { target: { value: label } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+    }
+    expect(screen.queryByText('Add at least two options to spin.')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Remove Yes' })).toBeTruthy();
+  });
+
   it('toggles color mode and remembers it', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Switch to dark mode' }));
