@@ -48,7 +48,7 @@ describe('App', () => {
 
   it.each([
     ['Coin', 'Flip the coin'],
-    ['Dice', 'Roll the die'],
+    ['Dice', 'Roll the dice'],
     ['Cards', 'Shuffle and draw'],
     ['Raffle', 'Draw winners'],
   ])('runs the %s mode', async (mode, action) => {

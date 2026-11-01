@@ -57,7 +57,7 @@ export const messages = defineMessages<Strings>({
       subtitle: {
         wheel: 'Add your options and spin.',
         coin: 'Two sides, one answer.',
-        dice: 'Pick a die and roll.',
+        dice: 'Pick your dice and roll.',
         cards: 'Shuffle the deck and reveal one card.',
         raffle: 'Draw winners without repeats.',
       },
@@ -72,9 +72,9 @@ export const messages = defineMessages<Strings>({
     },
     coin: { yes: 'Yes', no: 'No' },
     dice: {
-      sides: 'Die type',
+      sides: 'Dice type',
       useOptions: 'Use my options',
-      tooMany: 'This die only reaches the first {count} options.',
+      tooMany: 'Only the first {count} options can be rolled.',
     },
     raffle: { count: 'Winners' },
     roulette: {
@@ -82,7 +82,7 @@ export const messages = defineMessages<Strings>({
       action: {
         wheel: 'Spin the wheel',
         coin: 'Flip the coin',
-        dice: 'Roll the die',
+        dice: 'Roll the dice',
         cards: 'Shuffle and draw',
         raffle: 'Draw winners',
       },
