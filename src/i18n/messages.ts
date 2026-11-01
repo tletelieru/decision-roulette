@@ -60,9 +60,9 @@ export const messages = defineMessages<Strings>({
     hero: {
       title: 'Let chance decide',
       subtitle: {
-        wheel: 'Add your options and spin.',
+        wheel: 'Add your options, then spin or drag the wheel.',
         coin: 'Two sides, one answer.',
-        dice: 'Pick your dice and roll.',
+        dice: 'Pick your dice, then roll or drag it.',
         cards: 'Shuffle the deck and reveal one card.',
         raffle: 'Draw winners without repeats.',
         oracle: 'Ask anything. The oracle answers.',
@@ -309,9 +309,9 @@ export const messages = defineMessages<Strings>({
     hero: {
       title: 'Deja que el azar decida',
       subtitle: {
-        wheel: 'Agrega tus opciones y gira.',
+        wheel: 'Agrega tus opciones y gira o arrastra la ruleta.',
         coin: 'Dos caras, una respuesta.',
-        dice: 'Elige un dado y lánzalo.',
+        dice: 'Elige un dado y lánzalo o arrástralo.',
         cards: 'Baraja el mazo y revela una carta.',
         raffle: 'Sortea ganadores sin repetir.',
         oracle: 'Pregunta lo que quieras. El oráculo responde.',

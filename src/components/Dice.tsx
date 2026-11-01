@@ -1,9 +1,19 @@
 import { Box, Stack, ToggleButton, ToggleButtonGroup, useTheme } from '@mui/material';
 import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import type { Ref } from 'react';
+import type { PointerEvent, Ref } from 'react';
 import { messages } from '../i18n/messages';
 import { useMessages } from '../i18n/react';
-import { dot, normalize, planRoll, restingRotation, rollAt, rotate, solidFor } from '../lib/dice';
+import {
+  axisAngle,
+  dot,
+  multiply,
+  normalize,
+  planRoll,
+  restingRotation,
+  rollAt,
+  rotate,
+  solidFor,
+} from '../lib/dice';
 import type { Quat, Vec } from '../lib/dice';
 import { diceSides, hurry, stoppableProgress } from '../lib/modes';
 import type { Stage } from '../lib/modes';
@@ -11,8 +21,13 @@ import type { Stage } from '../lib/modes';
 type Props = {
   ref: Ref<Stage<number>>;
   sides: number;
+  draggable: boolean;
   onSides: (sides: number) => void;
+  onFling: () => void;
 };
+
+const DRAG_SPEED = 0.012;
+const MIN_DRAG_PX = 24;
 
 const LIGHT = normalize([-0.45, 0.6, 0.75]);
 const DEPTH = 0.16;
@@ -24,12 +39,13 @@ function shade(hex: string, light: number): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-export default function Dice({ ref, sides, onSides }: Props) {
+export default function Dice({ ref, sides, draggable, onSides, onFling }: Props) {
   const t = useMessages(messages).dice;
   const theme = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const orientation = useRef<Quat>(restingRotation(solidFor(sides), sides));
   const frame = useRef(0);
+  const drag = useRef<{ x: number; y: number; moved: number } | null>(null);
   const [rolled, setRolled] = useState<number | null>(null);
   const color = theme.palette.primary.main;
   const ink = theme.palette.primary.contrastText;
@@ -129,6 +145,37 @@ export default function Dice({ ref, sides, onSides }: Props) {
 
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
 
+  const startDrag = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (!draggable) return;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    drag.current = { x: event.clientX, y: event.clientY, moved: 0 };
+  };
+
+  const moveDrag = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (!drag.current) return;
+    const dx = event.clientX - drag.current.x;
+    const dy = event.clientY - drag.current.y;
+    const distance = Math.hypot(dx, dy);
+    if (!distance) return;
+    drag.current = {
+      x: event.clientX,
+      y: event.clientY,
+      moved: drag.current.moved + distance,
+    };
+    orientation.current = multiply(
+      axisAngle(normalize([dy, dx, 0]), distance * DRAG_SPEED),
+      orientation.current,
+    );
+    setRolled(null);
+    draw();
+  };
+
+  const endDrag = () => {
+    const moved = drag.current?.moved ?? 0;
+    drag.current = null;
+    if (moved >= MIN_DRAG_PX) onFling();
+  };
+
   useImperativeHandle(
     ref,
     () => ({
@@ -196,8 +243,17 @@ export default function Dice({ ref, sides, onSides }: Props) {
         component="canvas"
         role="img"
         aria-label={`d${sides}`}
+        onPointerDown={startDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={endDrag}
+        onPointerCancel={() => {
+          drag.current = null;
+        }}
         sx={{
           display: 'block',
+          touchAction: 'none',
+          cursor: draggable ? 'grab' : 'default',
+          '&:active': { cursor: draggable ? 'grabbing' : 'default' },
           width: 'min(62%, 34dvh, 280px)',
           aspectRatio: '1',
           filter: 'drop-shadow(0 14px 16px rgba(0,0,0,0.3))',

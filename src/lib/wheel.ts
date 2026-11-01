@@ -22,8 +22,13 @@ export function landingPoint(slice: Slice, rng: Rng = secureRandom): number {
   return slice.start + (slice.end - slice.start) * (0.2 + 0.6 * rng());
 }
 
-export function spinTarget(from: number, landing: number, turns: number): number {
+export function spinTarget(from: number, landing: number, turns: number, direction = 1): number {
+  if (direction < 0) return Math.floor(from) - turns - mod1(landing);
   return Math.ceil(from) + turns + mod1(-landing);
+}
+
+export function wrapDelta(delta: number): number {
+  return mod1(delta + 0.5) - 0.5;
 }
 
 export function overshootFor(slice: Slice): number {

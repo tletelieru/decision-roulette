@@ -6,6 +6,7 @@ import {
   sliceAt,
   spinPosition,
   spinTarget,
+  wrapDelta,
 } from './wheel';
 
 describe('buildSlices', () => {
@@ -27,6 +28,22 @@ describe('spinning', () => {
         expect(sliceAt(to, slices)).toBe(index);
       });
     }
+  });
+
+  it('stops on the picked slice when spinning backwards', () => {
+    for (const from of [0, 0.37, -5.91, 12.5]) {
+      slices.forEach((slice, index) => {
+        const to = spinTarget(from, landingPoint(slice), 6, -1);
+        expect(to).toBeLessThan(from - 5);
+        expect(sliceAt(to, slices)).toBe(index);
+      });
+    }
+  });
+
+  it('takes the short way across the top of the wheel', () => {
+    expect(wrapDelta(0.95)).toBeCloseTo(-0.05);
+    expect(wrapDelta(-0.95)).toBeCloseTo(0.05);
+    expect(wrapDelta(0.1)).toBeCloseTo(0.1);
   });
 
   it('keeps the settle bounce inside the slice', () => {

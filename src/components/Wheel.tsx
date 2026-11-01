@@ -1,6 +1,6 @@
 import { Box, ButtonBase, useTheme } from '@mui/material';
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
-import type { ReactNode, Ref } from 'react';
+import type { PointerEvent, ReactNode, Ref } from 'react';
 import { playTick } from '../lib/feedback';
 import { stoppableProgress } from '../lib/modes';
 import type { Option } from '../lib/options';
@@ -12,10 +12,16 @@ import {
   sliceAt,
   spinPosition,
   spinTarget,
+  wrapDelta,
 } from '../lib/wheel';
 
 export type WheelHandle = {
-  spin: (index: number, seconds: number, signal?: AbortSignal) => Promise<void>;
+  spin: (
+    index: number,
+    seconds: number,
+    signal?: AbortSignal,
+    direction?: number,
+  ) => Promise<void>;
 };
 
 type Props = {
@@ -23,9 +29,13 @@ type Props = {
   options: Option[];
   sound: boolean;
   disabled: boolean;
+  draggable: boolean;
   hubLabel: ReactNode;
   onHub: () => void;
+  onFling: (direction: number) => void;
 };
+
+const MIN_DRAG_TURNS = 0.02;
 
 const toRadians = (turn: number) => turn * Math.PI * 2 - Math.PI / 2;
 
@@ -36,12 +46,22 @@ function fit(ctx: CanvasRenderingContext2D, text: string, width: number): string
   return `${cut}…`;
 }
 
-export default function Wheel({ ref, options, sound, disabled, hubLabel, onHub }: Props) {
+export default function Wheel({
+  ref,
+  options,
+  sound,
+  disabled,
+  draggable,
+  hubLabel,
+  onHub,
+  onFling,
+}: Props) {
   const theme = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerRef = useRef<SVGSVGElement>(null);
   const rotation = useRef(0);
   const frame = useRef(0);
+  const drag = useRef<{ last: number; moved: number } | null>(null);
   const slices = useMemo(() => buildSlices(options.map((option) => option.weight)), [options]);
   const rim = theme.palette.background.paper;
 
@@ -127,10 +147,38 @@ export default function Wheel({ ref, options, sound, disabled, hubLabel, onHub }
 
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
 
+  const pointerTurn = (event: PointerEvent<HTMLCanvasElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left - rect.width / 2;
+    const y = event.clientY - rect.top - rect.height / 2;
+    return Math.atan2(x, -y) / (Math.PI * 2);
+  };
+
+  const startDrag = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (!draggable) return;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    drag.current = { last: pointerTurn(event), moved: 0 };
+  };
+
+  const moveDrag = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (!drag.current) return;
+    const turn = pointerTurn(event);
+    const delta = wrapDelta(turn - drag.current.last);
+    drag.current = { last: turn, moved: drag.current.moved + delta };
+    rotation.current += delta;
+    draw();
+  };
+
+  const endDrag = () => {
+    const moved = drag.current?.moved ?? 0;
+    drag.current = null;
+    if (Math.abs(moved) >= MIN_DRAG_TURNS) onFling(Math.sign(moved));
+  };
+
   useImperativeHandle(
     ref,
     () => ({
-      spin: (index, seconds, signal) =>
+      spin: (index, seconds, signal, direction = 1) =>
         new Promise((resolve) => {
           const slice = slices[index];
           const landing = landingPoint(slice);
@@ -141,8 +189,9 @@ export default function Wheel({ ref, options, sound, disabled, hubLabel, onHub }
             resolve();
             return;
           }
-          const to = spinTarget(from, landing, Math.max(3, Math.round(seconds * 1.4)));
-          const overshoot = overshootFor(slice);
+          const turns = Math.max(3, Math.round(seconds * 1.4));
+          const to = spinTarget(from, landing, turns, direction);
+          const overshoot = overshootFor(slice) * direction;
           const progressAt = stoppableProgress(seconds * 1000, signal, performance.now());
           let current = sliceAt(from, slices);
           const step = (now: number) => {
@@ -174,11 +223,20 @@ export default function Wheel({ ref, options, sound, disabled, hubLabel, onHub }
         component="canvas"
         role="img"
         aria-label={options.map((option) => option.label).join(', ')}
+        onPointerDown={startDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={endDrag}
+        onPointerCancel={() => {
+          drag.current = null;
+        }}
         sx={{
           display: 'block',
           width: '100%',
           height: '100%',
           borderRadius: '50%',
+          touchAction: 'none',
+          cursor: draggable ? 'grab' : 'default',
+          '&:active': { cursor: draggable ? 'grabbing' : 'default' },
           boxShadow: '0 18px 50px rgba(0,0,0,0.28)',
         }}
       />

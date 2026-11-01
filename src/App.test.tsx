@@ -231,6 +231,32 @@ describe('App', () => {
     await waitFor(() => expect(location.hash).toBe('#mode=dice&d=6'));
   });
 
+  it.each([
+    ['Dice', 'd6'],
+    ['Wheel', /^Movie, Walk/],
+  ])('starts the %s by dragging but not by tapping', async (mode, name) => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 5,
+        instant: true,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: mode }));
+    const canvas = screen.getByRole('img', { name });
+    fireEvent.pointerDown(canvas, { clientX: 10, clientY: 0 });
+    fireEvent.pointerUp(canvas, { clientX: 10, clientY: 0 });
+    expect(screen.queryByText('The result is')).toBeNull();
+    fireEvent.pointerDown(canvas, { clientX: 100, clientY: 0 });
+    fireEvent.pointerMove(canvas, { clientX: 0, clientY: 100 });
+    fireEvent.pointerUp(canvas, { clientX: 0, clientY: 100 });
+    expect(await screen.findByText('The result is')).toBeTruthy();
+  });
+
   it('limits raffle winners to the option count', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));

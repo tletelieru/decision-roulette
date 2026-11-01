@@ -167,7 +167,11 @@ export default function Roulette() {
     update({ mode: next });
   };
 
-  const draw = async (seconds: number, signal: AbortSignal): Promise<Result> => {
+  const draw = async (
+    seconds: number,
+    signal: AbortSignal,
+    direction: number,
+  ): Promise<Result> => {
     const weights = active.map((option) => option.weight);
     if (mode === 'coin') {
       const side = randomInt(2);
@@ -190,7 +194,7 @@ export default function Roulette() {
     const index = pickWeightedIndex(weights);
     if (mode === 'cards') await cards.current?.run(index, seconds, signal);
     else if (mode === 'oracle') await oracle.current?.run(index, seconds, signal);
-    else await wheel.current?.spin(index, seconds, signal);
+    else await wheel.current?.spin(index, seconds, signal, direction);
     return { lines: [active[index].label], color: sliceColor(index, active.length) };
   };
 
@@ -199,13 +203,13 @@ export default function Roulette() {
     controller.current?.abort();
   };
 
-  const run = async () => {
+  const run = async (direction = 1) => {
     if (!canRun) return;
     controller.current = new AbortController();
     setResult(null);
     setRunning(true);
     const seconds = settings.instant || prefersReducedMotion() ? 0 : settings.duration;
-    const next = await draw(seconds, controller.current.signal);
+    const next = await draw(seconds, controller.current.signal, direction);
     setRunning(false);
     setStopping(false);
     setResult(next);
@@ -239,8 +243,10 @@ export default function Roulette() {
             options={active}
             sound={settings.sound}
             disabled={!canRun && !canStop}
+            draggable={canRun}
             hubLabel={stopLabel ? t.roulette.stop.toUpperCase() : t.roulette.spin}
             onHub={() => (canStop ? stop() : void run())}
+            onFling={(direction) => void run(direction)}
           />
         )}
         {mode === 'coin' && <Coin ref={coin} labels={coinLabels} />}
@@ -249,7 +255,9 @@ export default function Roulette() {
             key={settings.sides}
             ref={dice}
             sides={settings.sides}
+            draggable={canRun}
             onSides={(sides) => update({ sides })}
+            onFling={() => void run()}
           />
         )}
         {mode === 'cards' && <Cards key={activeKey} ref={cards} options={active} />}
