@@ -1,5 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { STOP_MS, stoppableProgress, wait } from './modes';
+import { flipTarget, STOP_MS, stoppableProgress, wait } from './modes';
+
+describe('flipTarget', () => {
+  it.each([
+    [1, 0],
+    [1, 1],
+    [-1, 0],
+    [-1, 1],
+  ])('lands on the right side in direction %i for side %i', (direction, side) => {
+    for (const from of [0, 37, 180, -250, 1234]) {
+      const to = flipTarget(from, 4, side, direction);
+      const face = ((to % 360) + 360) % 360;
+      expect(face).toBe(side * 180);
+      expect(Math.abs(to - from)).toBeGreaterThan(360 * 3);
+      expect(Math.sign(to - from)).toBe(direction);
+    }
+  });
+});
 
 describe('stoppableProgress', () => {
   it('runs on its own timing until stopped', () => {

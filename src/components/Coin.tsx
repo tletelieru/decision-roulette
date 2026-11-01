@@ -1,11 +1,19 @@
 import { Box } from '@mui/material';
 import { useImperativeHandle, useRef } from 'react';
-import type { Ref } from 'react';
-import { hurry, STOP_MS, wait } from '../lib/modes';
+import type { PointerEvent, Ref } from 'react';
+import { flipTarget, hurry, STOP_MS, wait } from '../lib/modes';
 import type { Stage } from '../lib/modes';
 import { COIN_COLORS } from '../lib/palette';
 
-type Props = { ref: Ref<Stage<number>>; labels: [string, string] };
+type Props = {
+  ref: Ref<Stage<number>>;
+  labels: [string, string];
+  draggable: boolean;
+  onFling: (direction: number) => void;
+};
+
+const DRAG_SPEED = 0.7;
+const MIN_DRAG_PX = 24;
 
 const FACE = {
   position: 'absolute',
@@ -24,18 +32,45 @@ const FACE = {
   fontWeight: 800,
 } as const;
 
-export default function Coin({ ref, labels }: Props) {
+export default function Coin({ ref, labels, draggable, onFling }: Props) {
   const coin = useRef<HTMLDivElement>(null);
   const toss = useRef<HTMLDivElement>(null);
   const angle = useRef(0);
+  const drag = useRef<{ x: number; moved: number; start: number } | null>(null);
+
+  const turnTo = (value: number) => {
+    angle.current = value;
+    if (coin.current) coin.current.style.transform = `rotateY(${value}deg)`;
+  };
+
+  const startDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (!draggable) return;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    drag.current = { x: event.clientX, moved: 0, start: angle.current };
+  };
+
+  const moveDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (!drag.current) return;
+    const delta = event.clientX - drag.current.x;
+    drag.current = { ...drag.current, x: event.clientX, moved: drag.current.moved + delta };
+    turnTo(angle.current + delta * DRAG_SPEED);
+  };
+
+  const endDrag = () => {
+    if (!drag.current) return;
+    const { moved, start } = drag.current;
+    drag.current = null;
+    if (Math.abs(moved) >= MIN_DRAG_PX) onFling(Math.sign(moved));
+    else turnTo(start);
+  };
 
   useImperativeHandle(ref, () => ({
-    run: async (side, seconds, signal) => {
+    run: async (side, seconds, signal, direction = 1) => {
       const element = coin.current;
       if (!element) return;
       const from = angle.current;
       const flips = seconds > 0 ? Math.max(4, Math.round(seconds * 3)) : 1;
-      const to = (Math.ceil(from / 360) + flips) * 360 + side * 180;
+      const to = flipTarget(from, flips, side, direction);
       angle.current = to;
       let flip: Animation | undefined;
       let hop: Animation | undefined;
@@ -72,7 +107,27 @@ export default function Coin({ ref, labels }: Props) {
 
   return (
     <Box sx={{ width: '100%', display: 'grid', placeItems: 'center', py: 2 }}>
-      <Box ref={toss} sx={{ width: 'min(58%, 34dvh, 260px)', aspectRatio: '1', perspective: 900 }}>
+      <Box
+        ref={toss}
+        role="img"
+        aria-label={labels.join(' / ')}
+        onPointerDown={startDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={endDrag}
+        onPointerCancel={() => {
+          if (drag.current) turnTo(drag.current.start);
+          drag.current = null;
+        }}
+        sx={{
+          width: 'min(58%, 34dvh, 260px)',
+          aspectRatio: '1',
+          perspective: 900,
+          touchAction: 'none',
+          userSelect: 'none',
+          cursor: draggable ? 'grab' : 'default',
+          '&:active': { cursor: draggable ? 'grabbing' : 'default' },
+        }}
+      >
         <Box
           ref={coin}
           sx={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d' }}

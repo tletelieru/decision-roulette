@@ -5,7 +5,7 @@ export type Mode = (typeof modes)[number];
 export const diceSides = [4, 6, 8, 12, 20] as const;
 
 export type Stage<T> = {
-  run: (value: T, seconds: number, signal?: AbortSignal) => Promise<void>;
+  run: (value: T, seconds: number, signal?: AbortSignal, direction?: number) => Promise<void>;
   canvas?: () => HTMLCanvasElement | null;
 };
 
@@ -16,6 +16,11 @@ export function isMode(value: unknown): value is Mode {
 }
 
 export const needsOptions = (mode: Mode) => mode !== 'coin' && mode !== 'dice';
+
+export function flipTarget(from: number, flips: number, side: number, direction: number): number {
+  const turn = direction < 0 ? Math.floor(from / 360) - flips : Math.ceil(from / 360) + flips;
+  return turn * 360 + side * 180;
+}
 
 export function wait(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
