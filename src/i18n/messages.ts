@@ -55,7 +55,7 @@ export const messages = defineMessages<Strings>({
       title: 'Let chance decide',
       subtitle: {
         wheel: 'Add your options and spin.',
-        coin: 'A quick yes or no.',
+        coin: 'Two sides, one answer.',
         dice: 'Roll a die, with or without options.',
         cards: 'Shuffle the deck and reveal one card.',
         raffle: 'Draw winners without repeats.',
@@ -120,7 +120,7 @@ export const messages = defineMessages<Strings>({
       title: 'Deja que el azar decida',
       subtitle: {
         wheel: 'Agrega tus opciones y gira.',
-        coin: 'Un sí o no rápido.',
+        coin: 'Dos caras, una respuesta.',
         dice: 'Lanza un dado, con o sin opciones.',
         cards: 'Baraja el mazo y revela una carta.',
         raffle: 'Sortea ganadores sin repetir.',

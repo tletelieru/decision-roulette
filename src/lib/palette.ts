@@ -9,6 +9,8 @@ const PALETTE = [
   '#e8743b',
 ];
 
+export const COIN_COLORS = ['#2fa876', '#d9402f'];
+
 export function sliceColor(index: number, count: number): string {
   const color = PALETTE[index % PALETTE.length];
   if (index === count - 1 && index % PALETTE.length === 0 && count > 1) return PALETTE[2];

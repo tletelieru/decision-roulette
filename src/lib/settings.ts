@@ -10,6 +10,7 @@ export type Settings = {
   mode: Mode;
   sides: number;
   winners: number;
+  coinLabels: [string, string];
 };
 
 export const defaultSettings: Settings = {
@@ -21,7 +22,16 @@ export const defaultSettings: Settings = {
   mode: 'wheel',
   sides: 6,
   winners: 1,
+  coinLabels: ['', ''],
 };
+
+function isCoinLabels(value: unknown): value is [string, string] {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    value.every((label) => typeof label === 'string')
+  );
+}
 
 export function isSettings(value: unknown): value is Partial<Settings> {
   if (typeof value !== 'object' || value === null) return false;
@@ -39,6 +49,7 @@ export function restoreSettings(saved: Partial<Settings>): Settings {
   return {
     ...merged,
     mode: isMode(merged.mode) ? merged.mode : defaultSettings.mode,
+    coinLabels: isCoinLabels(merged.coinLabels) ? merged.coinLabels : defaultSettings.coinLabels,
     sides: (diceSides as readonly number[]).includes(merged.sides)
       ? merged.sides
       : defaultSettings.sides,

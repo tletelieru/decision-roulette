@@ -68,6 +68,32 @@ describe('App', () => {
     expect(await screen.findByText('The result is')).toBeTruthy();
   });
 
+  it('uses the coin sides instead of the option list', async () => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 5,
+        instant: true,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Coin' }));
+    expect(screen.queryByRole('button', { name: 'Remove Pizza' })).toBeNull();
+    for (const [name, value] of [
+      ['Option 1', 'Heads'],
+      ['Option 2', 'Heads'],
+    ]) {
+      fireEvent.change(screen.getByRole('textbox', { name }), { target: { value } });
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Flip the coin' }));
+    await screen.findByText('The result is');
+    expect(screen.getByRole('heading', { name: 'Options' })).toBeTruthy();
+    expect(screen.getAllByText('Heads').length).toBeGreaterThanOrEqual(3);
+  });
+
   it('adds options and blocks spinning with fewer than two', () => {
     localStorage.setItem('dr-options', '[]');
     render(<App />);

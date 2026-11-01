@@ -1,12 +1,11 @@
 import { Box } from '@mui/material';
 import { useImperativeHandle, useRef } from 'react';
 import type { Ref } from 'react';
-import { messages } from '../i18n/messages';
-import { useMessages } from '../i18n/react';
 import { wait } from '../lib/modes';
 import type { Stage } from '../lib/modes';
+import { COIN_COLORS } from '../lib/palette';
 
-type Props = { ref: Ref<Stage<number>> };
+type Props = { ref: Ref<Stage<number>>; labels: [string, string] };
 
 const FACE = {
   position: 'absolute',
@@ -18,12 +17,14 @@ const FACE = {
   border: '8px solid rgba(255,255,255,0.35)',
   boxShadow: 'inset 0 0 0 3px rgba(0,0,0,0.12), inset 0 -10px 24px rgba(0,0,0,0.18)',
   color: '#ffffff',
-  fontSize: 'clamp(1.75rem, 8vw, 3rem)',
+  p: 2,
+  textAlign: 'center',
+  overflowWrap: 'anywhere',
+  fontSize: 'clamp(1.25rem, 6vw, 2.25rem)',
   fontWeight: 800,
 } as const;
 
-export default function Coin({ ref }: Props) {
-  const t = useMessages(messages).coin;
+export default function Coin({ ref, labels }: Props) {
   const coin = useRef<HTMLDivElement>(null);
   const toss = useRef<HTMLDivElement>(null);
   const angle = useRef(0);
@@ -63,8 +64,10 @@ export default function Coin({ ref }: Props) {
           ref={coin}
           sx={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d' }}
         >
-          <Box sx={{ ...FACE, bgcolor: '#2fa876' }}>{t.yes}</Box>
-          <Box sx={{ ...FACE, bgcolor: '#d9402f', transform: 'rotateY(180deg)' }}>{t.no}</Box>
+          <Box sx={{ ...FACE, bgcolor: COIN_COLORS[0] }}>{labels[0]}</Box>
+          <Box sx={{ ...FACE, bgcolor: COIN_COLORS[1], transform: 'rotateY(180deg)' }}>
+            {labels[1]}
+          </Box>
         </Box>
       </Box>
     </Box>

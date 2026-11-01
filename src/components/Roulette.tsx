@@ -7,13 +7,14 @@ import { diceOption, needsOptions } from '../lib/modes';
 import type { Mode, Stage } from '../lib/modes';
 import { activeOptions, createOption, isOptionList, isPresetList } from '../lib/options';
 import type { Option, Preset } from '../lib/options';
-import { readableText, sliceColor } from '../lib/palette';
+import { COIN_COLORS, readableText, sliceColor } from '../lib/palette';
 import { pickMany, pickWeightedIndex, randomInt } from '../lib/random';
 import { defaultSettings, isSettings, restoreSettings } from '../lib/settings';
 import type { Settings } from '../lib/settings';
 import { load, save } from '../lib/storage';
 import Cards from './Cards';
 import Coin from './Coin';
+import CoinPanel from './CoinPanel';
 import Dice from './Dice';
 import ModeTabs from './ModeTabs';
 import OptionsPanel from './OptionsPanel';
@@ -26,8 +27,6 @@ const OPTIONS_KEY = 'dr-options';
 const PRESETS_KEY = 'dr-presets';
 const SETTINGS_KEY = 'dr-settings';
 
-const YES_COLOR = '#2fa876';
-const NO_COLOR = '#d9402f';
 const NUMBER_COLOR = '#6d4fe0';
 
 type Result = { lines: string[]; color: string };
@@ -59,6 +58,11 @@ export default function Roulette() {
   useEffect(() => save(PRESETS_KEY, presets), [presets]);
   useEffect(() => save(SETTINGS_KEY, settings), [settings]);
 
+  const coinLabels: [string, string] = [
+    settings.coinLabels[0].trim() || t.coin.yes,
+    settings.coinLabels[1].trim() || t.coin.no,
+  ];
+
   const update = (patch: Partial<Settings>) => setSettings({ ...settings, ...patch });
 
   const changeMode = (next: Mode) => {
@@ -71,9 +75,7 @@ export default function Roulette() {
     if (mode === 'coin') {
       const side = randomInt(2);
       await coin.current?.run(side, seconds);
-      return side === 0
-        ? { lines: [t.coin.yes], color: YES_COLOR }
-        : { lines: [t.coin.no], color: NO_COLOR };
+      return { lines: [coinLabels[side]], color: COIN_COLORS[side] };
     }
     if (mode === 'dice') {
       const value = randomInt(settings.sides) + 1;
@@ -136,7 +138,7 @@ export default function Roulette() {
             onHub={() => void run()}
           />
         )}
-        {mode === 'coin' && <Coin ref={coin} />}
+        {mode === 'coin' && <Coin ref={coin} labels={coinLabels} />}
         {mode === 'dice' && (
           <Dice
             key={settings.sides}
@@ -207,14 +209,21 @@ export default function Roulette() {
       </Stack>
 
       <Stack spacing={2} inert={running} sx={{ minWidth: 0, opacity: running ? 0.6 : 1 }}>
-        <OptionsPanel
-          options={options}
-          presets={presets}
-          showWeights={settings.showWeights}
-          onOptions={setOptions}
-          onPresets={setPresets}
-          onShowWeights={(showWeights) => update({ showWeights })}
-        />
+        {mode === 'coin' ? (
+          <CoinPanel
+            labels={settings.coinLabels}
+            onLabels={(labels) => update({ coinLabels: labels })}
+          />
+        ) : (
+          <OptionsPanel
+            options={options}
+            presets={presets}
+            showWeights={settings.showWeights}
+            onOptions={setOptions}
+            onPresets={setPresets}
+            onShowWeights={(showWeights) => update({ showWeights })}
+          />
+        )}
         <SettingsPanel settings={settings} onSettings={update} />
       </Stack>
     </Box>
