@@ -25,6 +25,10 @@ import type { WheelHandle } from './Wheel';
 
 const OPTIONS_KEY = 'dr-options';
 const RAFFLE_KEY = 'dr-raffle';
+const CARDS_KEY = 'dr-cards';
+const WHEEL_STARTER = 0;
+const CARDS_STARTER = 4;
+const RAFFLE_STARTER = 5;
 const PRESETS_KEY = 'dr-presets';
 const SETTINGS_KEY = 'dr-settings';
 
@@ -34,15 +38,16 @@ type Result = { lines: string[]; color: string };
 
 export default function Roulette() {
   const t = useMessages(messages);
+  const starter = (index: number) =>
+    t.options.starters[index].items.map((label) => createOption(label));
   const [options, setOptions] = useState<Option[]>(() =>
-    load(OPTIONS_KEY, isOptionList, t.options.starters[0].items.map((label) => createOption(label))),
+    load(OPTIONS_KEY, isOptionList, starter(WHEEL_STARTER)),
+  );
+  const [deck, setDeck] = useState<Option[]>(() =>
+    load(CARDS_KEY, isOptionList, starter(CARDS_STARTER)),
   );
   const [names, setNames] = useState<Option[]>(() =>
-    load(
-      RAFFLE_KEY,
-      isOptionList,
-      t.options.starters[t.options.starters.length - 1].items.map((label) => createOption(label)),
-    ),
+    load(RAFFLE_KEY, isOptionList, starter(RAFFLE_STARTER)),
   );
   const [presets, setPresets] = useState<Preset[]>(() => load(PRESETS_KEY, isPresetList, []));
   const [settings, setSettings] = useState<Settings>(() =>
@@ -57,7 +62,7 @@ export default function Roulette() {
   const dice = useRef<Stage<number>>(null);
   const cards = useRef<Stage<number>>(null);
   const raffle = useRef<Stage<number[]>>(null);
-  const list = settings.mode === 'raffle' ? names : options;
+  const list = settings.mode === 'raffle' ? names : settings.mode === 'cards' ? deck : options;
   const active = useMemo(() => activeOptions(list), [list]);
   const activeKey = active.map((option) => option.id).join();
   const { mode } = settings;
@@ -69,6 +74,7 @@ export default function Roulette() {
 
   useEffect(() => save(OPTIONS_KEY, options), [options]);
   useEffect(() => save(RAFFLE_KEY, names), [names]);
+  useEffect(() => save(CARDS_KEY, deck), [deck]);
   useEffect(() => save(PRESETS_KEY, presets), [presets]);
   useEffect(() => save(SETTINGS_KEY, settings), [settings]);
 
@@ -240,7 +246,7 @@ export default function Roulette() {
             options={list}
             presets={presets}
             showWeights={settings.showWeights}
-            onOptions={mode === 'raffle' ? setNames : setOptions}
+            onOptions={mode === 'raffle' ? setNames : mode === 'cards' ? setDeck : setOptions}
             onPresets={setPresets}
             onShowWeights={(showWeights) => update({ showWeights })}
           />
