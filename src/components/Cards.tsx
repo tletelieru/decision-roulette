@@ -1,17 +1,16 @@
 import { Box, Typography } from '@mui/material';
-import { useImperativeHandle, useRef, useState } from 'react';
+import { useImperativeHandle, useState } from 'react';
 import type { Ref } from 'react';
-import { hurry, wait } from '../lib/modes';
+import { wait } from '../lib/modes';
 import type { Stage } from '../lib/modes';
 import type { Option } from '../lib/options';
-import { randomInt } from '../lib/random';
+import { moveAll } from '../lib/random';
 
 type Props = { ref: Ref<Stage<number>>; options: Option[] };
 
-type Reveal = { position: number; label: string };
-
 const FLIP_MS = 380;
 const ROUND_MS = 650;
+const MOVE_MS = 500;
 
 const FACE = {
   position: 'absolute',
@@ -35,51 +34,32 @@ function fanPlacement(position: number, count: number) {
 }
 
 export default function Cards({ ref, options }: Props) {
-  const [reveal, setReveal] = useState<Reveal | null>(null);
-  const fan = useRef<HTMLDivElement>(null);
+  const [reveal, setReveal] = useState<number | null>(null);
+  const [slots, setSlots] = useState(() => options.map((_, index) => index));
 
   useImperativeHandle(ref, () => ({
     run: async (index, seconds, signal) => {
       setReveal(null);
-      const element = fan.current;
-      if (seconds > 0 && element) {
+      if (seconds > 0) {
         const shuffle = Math.max(ROUND_MS, seconds * 1000 - FLIP_MS);
         const rounds = Math.max(1, Math.round(shuffle / ROUND_MS));
-        const bounds = element.getBoundingClientRect();
-        for (let round = 0; round < rounds; round += 1) {
-          const moves = Array.from(element.children).map((card) => {
-            const rect = card.getBoundingClientRect();
-            const dx = bounds.left + bounds.width / 2 - rect.left - rect.width / 2;
-            return card.firstElementChild?.animate?.(
-              [
-                { transform: 'none' },
-                { transform: `translateX(${dx}px) rotate(${randomInt(30) - 15}deg)`, offset: 0.4 },
-                { transform: `translateX(${dx}px) rotate(${randomInt(30) - 15}deg)`, offset: 0.6 },
-                { transform: 'none' },
-              ],
-              { duration: shuffle / rounds, easing: 'ease-in-out' },
-            );
-          });
+        for (let round = 0; round < rounds && !signal?.aborted; round += 1) {
+          setSlots(moveAll);
           await wait(shuffle / rounds, signal);
-          if (signal?.aborted) {
-            moves.forEach(hurry);
-            break;
-          }
         }
       }
-      setReveal({ position: randomInt(options.length), label: options[index].label });
+      setReveal(index);
       if (seconds > 0) await wait(FLIP_MS);
     },
   }));
 
   return (
     <Box
-      ref={fan}
       sx={{ position: 'relative', width: '100%', maxWidth: 620, height: 'clamp(220px, 34dvh, 300px)' }}
     >
-      {options.map((option, position) => {
-        const open = reveal?.position === position;
-        const { left, top, angle } = fanPlacement(position, options.length);
+      {options.map((option, index) => {
+        const open = reveal === index;
+        const { left, top, angle } = fanPlacement(slots[index], options.length);
         return (
           <Box
             key={option.id}
@@ -89,9 +69,10 @@ export default function Cards({ ref, options }: Props) {
               top,
               width: 'clamp(92px, 24%, 136px)',
               aspectRatio: '3 / 4',
-              zIndex: open ? options.length : position,
+              zIndex: open ? options.length : slots[index],
               transform: `translateX(-50%) rotate(${angle}deg)`,
               transformOrigin: '50% 100%',
+              transition: `left ${MOVE_MS}ms ease-in-out, top ${MOVE_MS}ms ease-in-out, transform ${MOVE_MS}ms ease-in-out`,
               perspective: 800,
             }}
           >
@@ -101,7 +82,7 @@ export default function Cards({ ref, options }: Props) {
                 height: '100%',
                 transition: `transform ${FLIP_MS}ms ease, filter ${FLIP_MS}ms ease`,
                 transform: open ? `rotate(${-angle}deg) translateY(-8%) scale(1.14)` : 'none',
-                filter: reveal && !open ? 'grayscale(0.75) brightness(0.6)' : 'none',
+                filter: reveal !== null && !open ? 'grayscale(0.75) brightness(0.6)' : 'none',
               }}
             >
               <Box
@@ -139,7 +120,7 @@ export default function Cards({ ref, options }: Props) {
                     <Typography
                       sx={{ fontWeight: 700, textAlign: 'center', overflowWrap: 'anywhere' }}
                     >
-                      {reveal.label}
+                      {option.label}
                     </Typography>
                   )}
                 </Box>

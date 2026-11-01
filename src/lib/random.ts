@@ -8,6 +8,15 @@ export const secureRandom: Rng = () => {
 
 export const randomInt = (max: number, rng: Rng = secureRandom) => Math.floor(rng() * max);
 
+export function moveAll(slots: number[], rng: Rng = secureRandom): number[] {
+  const next = [...slots];
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = randomInt(i, rng);
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+}
+
 export function pickMany(weights: number[], count: number, rng: Rng = secureRandom): number[] {
   const remaining = [...weights];
   const picks: number[] = [];

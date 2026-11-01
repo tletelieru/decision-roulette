@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pickMany, pickWeightedIndex, randomInt, secureRandom } from './random';
+import { moveAll, pickMany, pickWeightedIndex, randomInt, secureRandom } from './random';
 
 describe('pickWeightedIndex', () => {
   it('maps the roll onto the weight ranges', () => {
@@ -37,6 +37,21 @@ describe('pickMany', () => {
 
   it('stops when the pool runs out', () => {
     expect(pickMany([1, 0, 1], 5).sort()).toEqual([0, 2]);
+  });
+});
+
+describe('moveAll', () => {
+  it('moves every card and keeps every slot', () => {
+    const slots = [0, 1, 2, 3, 4, 5];
+    for (let i = 0; i < 500; i += 1) {
+      const next = moveAll(slots);
+      expect([...next].sort()).toEqual(slots);
+      next.forEach((slot, index) => expect(slot).not.toBe(slots[index]));
+    }
+  });
+
+  it('handles a single card', () => {
+    expect(moveAll([0])).toEqual([0]);
   });
 });
 
