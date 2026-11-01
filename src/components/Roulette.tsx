@@ -177,7 +177,7 @@ export default function Roulette() {
     const weights = active.map((option) => option.weight);
     if (mode === 'coin') {
       const side = randomInt(2);
-      await coin.current?.run(side, seconds, signal);
+      await coin.current?.run(side, seconds, signal, direction);
       return {
         lines: [coinLabels[side]],
         color: COIN_COLORS[side],
@@ -270,7 +270,12 @@ export default function Roulette() {
             onFling={(direction) => void run(direction)}
           />
         )}
-        {mode === 'coin' && <Coin ref={coin} labels={coinLabels} />}
+        {mode === 'coin' && <Coin
+            ref={coin}
+            labels={coinLabels}
+            draggable={canRun}
+            onFling={(direction) => void run(direction)}
+          />}
         {mode === 'dice' && (
           <Dice
             key={settings.sides}

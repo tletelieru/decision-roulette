@@ -234,6 +234,7 @@ describe('App', () => {
   it.each([
     ['Dice', 'd6'],
     ['Wheel', /^Movie, Walk/],
+    ['Coin', 'Yes / No'],
   ])('starts the %s by dragging but not by tapping', async (mode, name) => {
     localStorage.setItem(
       'dr-settings',
