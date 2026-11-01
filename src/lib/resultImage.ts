@@ -289,6 +289,13 @@ export function resultBlob(card: ResultCard): Promise<Blob | null> {
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
+export function shareMessage(
+  card: Pick<ResultCard, 'winner' | 'lines' | 'question'>,
+  link: string,
+): string {
+  return `${resultText(card)}\n${link}`;
+}
+
 export function resultText(card: Pick<ResultCard, 'winner' | 'lines' | 'question'>): string {
   const answer = `${card.winner}: ${card.lines.join(', ')}`;
   return card.question ? `${card.question} ${answer}` : answer;

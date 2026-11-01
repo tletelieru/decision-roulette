@@ -2,7 +2,7 @@ import { Button, FormControlLabel, Stack, Switch, Typography } from '@mui/materi
 import { useEffect, useState } from 'react';
 import { messages } from '../i18n/messages';
 import { useMessages } from '../i18n/react';
-import { resultBlob, resultText } from '../lib/resultImage';
+import { resultBlob, shareMessage } from '../lib/resultImage';
 import type { ResultCard } from '../lib/resultImage';
 
 type Props = { card: Omit<ResultCard, 'confetti'>; link: string };
@@ -32,16 +32,24 @@ export default function ResultActions({ card, link }: Props) {
   };
 
   const share = async () => {
-    const text = resultText(card);
+    const text = shareMessage(card, link);
     const blob = await resultBlob({ ...card, confetti });
     const files = blob ? [new File([blob], FILE_NAME, { type: 'image/png' })] : [];
     try {
       if (files.length && navigator.canShare?.({ files })) {
         await navigator.share({ files, text, title: card.appName });
       } else if (navigator.share) {
-        await navigator.share({ text, url: link, title: card.appName });
+        await navigator.share({ text, title: card.appName });
+      } else if (blob && typeof ClipboardItem !== 'undefined') {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'image/png': blob,
+            'text/plain': new Blob([text], { type: 'text/plain' }),
+          }),
+        ]);
+        setCopied(true);
       } else {
-        await navigator.clipboard.writeText(`${text}\n${link}`);
+        await navigator.clipboard.writeText(text);
         setCopied(true);
       }
     } catch {

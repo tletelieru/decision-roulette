@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { confettiPieces, resultText, wrapWords } from './resultImage';
+import { confettiPieces, resultText, shareMessage, wrapWords } from './resultImage';
 
 describe('confettiPieces', () => {
   it('keeps every piece on the card and off the background color', () => {
@@ -23,6 +23,14 @@ describe('wrapWords', () => {
 
   it('keeps a single long word whole', () => {
     expect(wrapWords('Definitivamente', () => false)).toEqual(['Definitivamente']);
+  });
+});
+
+describe('shareMessage', () => {
+  it('sends the result with the page link', () => {
+    expect(
+      shareMessage({ winner: 'The result is', lines: ['Yes'] }, 'https://example.com/#mode=coin'),
+    ).toBe('The result is: Yes\nhttps://example.com/#mode=coin');
   });
 });
 
