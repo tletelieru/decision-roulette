@@ -5,7 +5,7 @@ import { messages } from '../i18n/messages';
 import { useMessages } from '../i18n/react';
 import { dot, normalize, planRoll, restingRotation, rollAt, rotate, solidFor } from '../lib/dice';
 import type { Quat, Vec } from '../lib/dice';
-import { diceSides } from '../lib/modes';
+import { diceSides, hurry, stoppableProgress } from '../lib/modes';
 import type { Stage } from '../lib/modes';
 
 type Props = {
@@ -132,7 +132,7 @@ export default function Dice({ ref, sides, onSides }: Props) {
   useImperativeHandle(
     ref,
     () => ({
-      run: (value, seconds) =>
+      run: (value, seconds, signal) =>
         new Promise((resolve) => {
           const end = restingRotation(solidFor(sides), value);
           setRolled(null);
@@ -145,7 +145,7 @@ export default function Dice({ ref, sides, onSides }: Props) {
           const total = seconds * 1000;
           const turns = Math.max(3, Math.round(seconds * 1.5));
           const roll = planRoll(orientation.current, end, turns, normalize([0.7, 0.2, 0.5]));
-          canvasRef.current?.animate?.(
+          const hop = canvasRef.current?.animate?.(
             [
               { transform: 'translateY(0) scale(1)' },
               { transform: 'translateY(-12%) scale(1.08)', offset: 0.3 },
@@ -155,9 +155,10 @@ export default function Dice({ ref, sides, onSides }: Props) {
             ],
             { duration: total, easing: 'ease-in-out' },
           );
-          const startedAt = performance.now();
+          signal?.addEventListener('abort', () => hurry(hop), { once: true });
+          const progressAt = stoppableProgress(total, signal, performance.now());
           const step = (now: number) => {
-            const progress = Math.min(1, (now - startedAt) / total);
+            const progress = progressAt(now);
             orientation.current = rollAt(roll, progress);
             draw();
             if (progress < 1) {

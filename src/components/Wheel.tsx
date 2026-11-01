@@ -2,6 +2,7 @@ import { Box, ButtonBase, useTheme } from '@mui/material';
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import type { ReactNode, Ref } from 'react';
 import { playTick } from '../lib/feedback';
+import { stoppableProgress } from '../lib/modes';
 import type { Option } from '../lib/options';
 import { readableText, sliceColor } from '../lib/palette';
 import {
@@ -13,7 +14,9 @@ import {
   spinTarget,
 } from '../lib/wheel';
 
-export type WheelHandle = { spin: (index: number, seconds: number) => Promise<void> };
+export type WheelHandle = {
+  spin: (index: number, seconds: number, signal?: AbortSignal) => Promise<void>;
+};
 
 type Props = {
   ref: Ref<WheelHandle>;
@@ -127,7 +130,7 @@ export default function Wheel({ ref, options, sound, disabled, hubLabel, onHub }
   useImperativeHandle(
     ref,
     () => ({
-      spin: (index, seconds) =>
+      spin: (index, seconds, signal) =>
         new Promise((resolve) => {
           const slice = slices[index];
           const landing = landingPoint(slice);
@@ -140,10 +143,10 @@ export default function Wheel({ ref, options, sound, disabled, hubLabel, onHub }
           }
           const to = spinTarget(from, landing, Math.max(3, Math.round(seconds * 1.4)));
           const overshoot = overshootFor(slice);
-          const startedAt = performance.now();
+          const progressAt = stoppableProgress(seconds * 1000, signal, performance.now());
           let current = sliceAt(from, slices);
           const step = (now: number) => {
-            const progress = Math.min(1, (now - startedAt) / (seconds * 1000));
+            const progress = progressAt(now);
             rotation.current = spinPosition(progress, from, to, overshoot);
             draw();
             const next = sliceAt(rotation.current, slices);

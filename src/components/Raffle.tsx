@@ -22,13 +22,13 @@ export default function Raffle({ ref, options, count, onCount }: Props) {
   const [cursor, setCursor] = useState(-1);
 
   useImperativeHandle(ref, () => ({
-    run: async (picks, seconds) => {
+    run: async (picks, seconds, signal) => {
       setWinners([]);
       const perWinner = (seconds * 1000) / picks.length;
       for (let round = 0; round < picks.length; round += 1) {
-        for (let elapsed = 0; elapsed < perWinner; elapsed += 90) {
+        for (let elapsed = 0; elapsed < perWinner && !signal?.aborted; elapsed += 90) {
           setCursor(randomInt(options.length));
-          await wait(90);
+          await wait(90, signal);
         }
         setWinners(picks.slice(0, round + 1));
       }

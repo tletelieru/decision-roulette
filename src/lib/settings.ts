@@ -4,6 +4,7 @@ import type { Mode } from './modes';
 export type Settings = {
   duration: number;
   instant: boolean;
+  stopButton: boolean;
   sound: boolean;
   confetti: boolean;
   showWeights: boolean;
@@ -16,6 +17,7 @@ export type Settings = {
 export const defaultSettings: Settings = {
   duration: 5,
   instant: false,
+  stopButton: false,
   sound: true,
   confetti: true,
   showWeights: false,

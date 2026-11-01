@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { useImperativeHandle, useRef, useState } from 'react';
 import type { Ref } from 'react';
-import { wait } from '../lib/modes';
+import { hurry, wait } from '../lib/modes';
 import type { Stage } from '../lib/modes';
 import type { Option } from '../lib/options';
 import { randomInt } from '../lib/random';
@@ -39,7 +39,7 @@ export default function Cards({ ref, options }: Props) {
   const fan = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => ({
-    run: async (index, seconds) => {
+    run: async (index, seconds, signal) => {
       setReveal(null);
       const element = fan.current;
       if (seconds > 0 && element) {
@@ -47,10 +47,10 @@ export default function Cards({ ref, options }: Props) {
         const rounds = Math.max(1, Math.round(shuffle / ROUND_MS));
         const bounds = element.getBoundingClientRect();
         for (let round = 0; round < rounds; round += 1) {
-          for (const card of Array.from(element.children)) {
+          const moves = Array.from(element.children).map((card) => {
             const rect = card.getBoundingClientRect();
             const dx = bounds.left + bounds.width / 2 - rect.left - rect.width / 2;
-            card.firstElementChild?.animate?.(
+            return card.firstElementChild?.animate?.(
               [
                 { transform: 'none' },
                 { transform: `translateX(${dx}px) rotate(${randomInt(30) - 15}deg)`, offset: 0.4 },
@@ -59,8 +59,12 @@ export default function Cards({ ref, options }: Props) {
               ],
               { duration: shuffle / rounds, easing: 'ease-in-out' },
             );
+          });
+          await wait(shuffle / rounds, signal);
+          if (signal?.aborted) {
+            moves.forEach(hurry);
+            break;
           }
-          await wait(shuffle / rounds);
         }
       }
       setReveal({ position: randomInt(options.length), label: options[index].label });

@@ -13,6 +13,7 @@ type Strings = {
   raffle: { count: string; more: string; fewer: string };
   roulette: {
     spin: string;
+    stop: string;
     action: Record<Mode, string>;
     spinning: string;
     winner: string;
@@ -41,6 +42,7 @@ type Strings = {
     title: string;
     duration: string;
     instant: string;
+    stopButton: string;
     sound: string;
     confetti: string;
   };
@@ -76,6 +78,7 @@ export const messages = defineMessages<Strings>({
     raffle: { count: 'Winners', more: 'More winners', fewer: 'Fewer winners' },
     roulette: {
       spin: 'SPIN',
+      stop: 'Stop',
       action: {
         wheel: 'Spin the wheel',
         coin: 'Flip the coin',
@@ -122,6 +125,7 @@ export const messages = defineMessages<Strings>({
       title: 'Settings',
       duration: 'Spin duration',
       instant: 'Instant result',
+      stopButton: 'Stop button',
       sound: 'Sound',
       confetti: 'Confetti',
     },
@@ -155,6 +159,7 @@ export const messages = defineMessages<Strings>({
     raffle: { count: 'Ganadores', more: 'Más ganadores', fewer: 'Menos ganadores' },
     roulette: {
       spin: 'GIRAR',
+      stop: 'Detener',
       action: {
         wheel: 'Girar la ruleta',
         coin: 'Lanzar la moneda',
@@ -201,6 +206,7 @@ export const messages = defineMessages<Strings>({
       title: 'Ajustes',
       duration: 'Duración del giro',
       instant: 'Resultado instantáneo',
+      stopButton: 'Botón de detener',
       sound: 'Sonido',
       confetti: 'Confeti',
     },

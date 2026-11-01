@@ -131,6 +131,47 @@ describe('App', () => {
     expect(screen.queryByRole('button', { name: 'Remove Ben' })).toBeNull();
   });
 
+  it.each([
+    ['Raffle', 'Draw winners'],
+    ['Cards', 'Shuffle and draw'],
+    ['Coin', 'Flip the coin'],
+  ])('stops the %s mode early', async (mode, action) => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 12,
+        instant: false,
+        stopButton: true,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: mode }));
+    fireEvent.click(screen.getByRole('button', { name: action }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Stop' }));
+    expect(await screen.findByText('The result is', {}, { timeout: 2000 })).toBeTruthy();
+    expect(screen.getByRole('button', { name: action })).toBeTruthy();
+  });
+
+  it('hides the stop button unless it is switched on', async () => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 12,
+        instant: false,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Draw winners' }));
+    expect(screen.queryByRole('button', { name: 'Stop' })).toBeNull();
+  });
+
   it('limits raffle winners to the option count', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));

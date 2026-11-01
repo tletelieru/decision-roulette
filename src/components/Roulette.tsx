@@ -50,6 +50,8 @@ export default function Roulette() {
   );
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+  const [stopping, setStopping] = useState(false);
+  const controller = useRef<AbortController | null>(null);
   const wheel = useRef<WheelHandle>(null);
   const coin = useRef<Stage<number>>(null);
   const dice = useRef<Stage<number>>(null);
@@ -61,6 +63,8 @@ export default function Roulette() {
   const { mode } = settings;
   const missingOptions = needsOptions(mode) && active.length < 2;
   const canRun = !missingOptions && !running;
+  const canStop = running && settings.stopButton && !stopping;
+  const stopLabel = running && settings.stopButton;
   const winners = Math.min(Math.max(1, settings.winners), Math.max(1, active.length));
 
   useEffect(() => save(OPTIONS_KEY, options), [options]);
@@ -80,38 +84,46 @@ export default function Roulette() {
     update({ mode: next });
   };
 
-  const draw = async (seconds: number): Promise<Result> => {
+  const draw = async (seconds: number, signal: AbortSignal): Promise<Result> => {
     const weights = active.map((option) => option.weight);
     if (mode === 'coin') {
       const side = randomInt(2);
-      await coin.current?.run(side, seconds);
+      await coin.current?.run(side, seconds, signal);
       return { lines: [coinLabels[side]], color: COIN_COLORS[side] };
     }
     if (mode === 'dice') {
       const value = randomInt(settings.sides) + 1;
-      await dice.current?.run(value, seconds);
+      await dice.current?.run(value, seconds, signal);
       return { lines: [`${value}`], color: NUMBER_COLOR };
     }
     if (mode === 'raffle') {
       const picks = pickMany(weights, winners);
-      await raffle.current?.run(picks, seconds);
+      await raffle.current?.run(picks, seconds, signal);
       return {
         lines: picks.map((pick, place) => `${place + 1}. ${active[pick].label}`),
         color: NUMBER_COLOR,
       };
     }
     const index = pickWeightedIndex(weights);
-    if (mode === 'cards') await cards.current?.run(index, seconds);
-    else await wheel.current?.spin(index, seconds);
+    if (mode === 'cards') await cards.current?.run(index, seconds, signal);
+    else await wheel.current?.spin(index, seconds, signal);
     return { lines: [active[index].label], color: sliceColor(index, active.length) };
+  };
+
+  const stop = () => {
+    setStopping(true);
+    controller.current?.abort();
   };
 
   const run = async () => {
     if (!canRun) return;
+    controller.current = new AbortController();
     setResult(null);
     setRunning(true);
-    const next = await draw(settings.instant || prefersReducedMotion() ? 0 : settings.duration);
+    const seconds = settings.instant || prefersReducedMotion() ? 0 : settings.duration;
+    const next = await draw(seconds, controller.current.signal);
     setRunning(false);
+    setStopping(false);
     setResult(next);
     if (settings.sound) playWin();
     if (settings.confetti) burstConfetti();
@@ -142,9 +154,9 @@ export default function Roulette() {
             ref={wheel}
             options={active}
             sound={settings.sound}
-            disabled={!canRun}
-            hubLabel={t.roulette.spin}
-            onHub={() => void run()}
+            disabled={!canRun && !canStop}
+            hubLabel={stopLabel ? t.roulette.stop.toUpperCase() : t.roulette.spin}
+            onHub={() => (canStop ? stop() : void run())}
           />
         )}
         {mode === 'coin' && <Coin ref={coin} labels={coinLabels} />}
@@ -200,8 +212,8 @@ export default function Roulette() {
         <Button
           variant="contained"
           size="large"
-          disabled={!canRun}
-          onClick={() => void run()}
+          disabled={!canRun && !canStop}
+          onClick={() => (canStop ? stop() : void run())}
           sx={{
             px: 6,
             width: { xs: '100%', sm: 'auto' },
@@ -212,7 +224,7 @@ export default function Roulette() {
             '&.Mui-disabled': { bgcolor: 'action.disabledBackground', backdropFilter: 'blur(8px)' },
           }}
         >
-          {t.roulette.action[mode]}
+          {stopLabel ? t.roulette.stop : t.roulette.action[mode]}
         </Button>
       </Stack>
 

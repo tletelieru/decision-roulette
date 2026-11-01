@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { useImperativeHandle, useRef } from 'react';
 import type { Ref } from 'react';
-import { wait } from '../lib/modes';
+import { hurry, STOP_MS, wait } from '../lib/modes';
 import type { Stage } from '../lib/modes';
 import { COIN_COLORS } from '../lib/palette';
 
@@ -30,20 +30,22 @@ export default function Coin({ ref, labels }: Props) {
   const angle = useRef(0);
 
   useImperativeHandle(ref, () => ({
-    run: async (side, seconds) => {
+    run: async (side, seconds, signal) => {
       const element = coin.current;
       if (!element) return;
       const from = angle.current;
       const flips = seconds > 0 ? Math.max(4, Math.round(seconds * 3)) : 1;
       const to = (Math.ceil(from / 360) + flips) * 360 + side * 180;
       angle.current = to;
+      let flip: Animation | undefined;
+      let hop: Animation | undefined;
       if (seconds > 0) {
         const duration = seconds * 1000;
-        element.animate?.(
+        flip = element.animate?.(
           [{ transform: `rotateY(${from}deg)` }, { transform: `rotateY(${to}deg)` }],
           { duration, easing: 'cubic-bezier(0.15, 0.7, 0.2, 1)' },
         );
-        toss.current?.animate?.(
+        hop = toss.current?.animate?.(
           [
             { transform: 'translateY(0)' },
             { transform: 'translateY(-16%)', offset: 0.35 },
@@ -53,7 +55,18 @@ export default function Coin({ ref, labels }: Props) {
         );
       }
       element.style.transform = `rotateY(${to}deg)`;
-      if (seconds > 0) await wait(seconds * 1000);
+      if (seconds > 0) {
+        signal?.addEventListener(
+          'abort',
+          () => {
+            hurry(flip);
+            hurry(hop);
+          },
+          { once: true },
+        );
+        await wait(seconds * 1000, signal);
+        if (signal?.aborted) await wait(STOP_MS);
+      }
     },
   }));
 

@@ -5,9 +5,9 @@ import type { Settings } from '../lib/settings';
 
 type Props = { settings: Settings; onSettings: (patch: Partial<Settings>) => void };
 
-type Toggle = 'instant' | 'sound' | 'confetti';
+type Toggle = 'instant' | 'stopButton' | 'sound' | 'confetti';
 
-const TOGGLES: Toggle[] = ['instant', 'sound', 'confetti'];
+const TOGGLES: Toggle[] = ['instant', 'stopButton', 'sound', 'confetti'];
 
 export default function SettingsPanel({ settings, onSettings }: Props) {
   const t = useMessages(messages).settings;
