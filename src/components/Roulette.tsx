@@ -24,6 +24,7 @@ import Wheel from './Wheel';
 import type { WheelHandle } from './Wheel';
 
 const OPTIONS_KEY = 'dr-options';
+const RAFFLE_KEY = 'dr-raffle';
 const PRESETS_KEY = 'dr-presets';
 const SETTINGS_KEY = 'dr-settings';
 
@@ -36,6 +37,13 @@ export default function Roulette() {
   const [options, setOptions] = useState<Option[]>(() =>
     load(OPTIONS_KEY, isOptionList, t.options.starters[0].items.map((label) => createOption(label))),
   );
+  const [names, setNames] = useState<Option[]>(() =>
+    load(
+      RAFFLE_KEY,
+      isOptionList,
+      t.options.starters[t.options.starters.length - 1].items.map((label) => createOption(label)),
+    ),
+  );
   const [presets, setPresets] = useState<Preset[]>(() => load(PRESETS_KEY, isPresetList, []));
   const [settings, setSettings] = useState<Settings>(() =>
     restoreSettings(load(SETTINGS_KEY, isSettings, defaultSettings)),
@@ -47,7 +55,8 @@ export default function Roulette() {
   const dice = useRef<Stage<number>>(null);
   const cards = useRef<Stage<number>>(null);
   const raffle = useRef<Stage<number[]>>(null);
-  const active = useMemo(() => activeOptions(options), [options]);
+  const list = settings.mode === 'raffle' ? names : options;
+  const active = useMemo(() => activeOptions(list), [list]);
   const activeKey = active.map((option) => option.id).join();
   const { mode } = settings;
   const missingOptions = needsOptions(mode) && active.length < 2;
@@ -55,6 +64,7 @@ export default function Roulette() {
   const winners = Math.min(Math.max(1, settings.winners), Math.max(1, active.length));
 
   useEffect(() => save(OPTIONS_KEY, options), [options]);
+  useEffect(() => save(RAFFLE_KEY, names), [names]);
   useEffect(() => save(PRESETS_KEY, presets), [presets]);
   useEffect(() => save(SETTINGS_KEY, settings), [settings]);
 
@@ -214,10 +224,11 @@ export default function Roulette() {
           />
         ) : mode === 'dice' ? null : (
           <OptionsPanel
-            options={options}
+            title={mode === 'raffle' ? t.options.raffleTitle : t.options.title}
+            options={list}
             presets={presets}
             showWeights={settings.showWeights}
-            onOptions={setOptions}
+            onOptions={mode === 'raffle' ? setNames : setOptions}
             onPresets={setPresets}
             onShowWeights={(showWeights) => update({ showWeights })}
           />

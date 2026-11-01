@@ -120,6 +120,17 @@ describe('App', () => {
     expect(screen.queryByRole('button', { name: 'Remove Movie' })).toBeNull();
   });
 
+  it('keeps a separate list for the raffle', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));
+    expect(screen.getByRole('heading', { name: 'Participants' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Remove Ana' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Ana' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Wheel' }));
+    expect(screen.getByRole('button', { name: 'Remove Movie' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Remove Ben' })).toBeNull();
+  });
+
   it('limits raffle winners to the option count', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));

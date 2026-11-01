@@ -20,6 +20,7 @@ type Strings = {
   };
   options: {
     title: string;
+    raffleTitle: string;
     option: string;
     weights: string;
     remove: string;
@@ -88,6 +89,7 @@ export const messages = defineMessages<Strings>({
     },
     options: {
       title: 'Options',
+      raffleTitle: 'Participants',
       option: 'Option',
       weights: 'Weights',
       remove: 'Remove',
@@ -113,6 +115,7 @@ export const messages = defineMessages<Strings>({
           name: 'Chores',
           items: ['Dishes', 'Laundry', 'Vacuum', 'Trash', 'Groceries', 'Bathroom'],
         },
+        { name: 'Names', items: ['Ana', 'Ben', 'Carla', 'Diego', 'Elena', 'Felix'] },
       ],
     },
     settings: {
@@ -165,6 +168,7 @@ export const messages = defineMessages<Strings>({
     },
     options: {
       title: 'Opciones',
+      raffleTitle: 'Participantes',
       option: 'Opción',
       weights: 'Pesos',
       remove: 'Quitar',
@@ -190,6 +194,7 @@ export const messages = defineMessages<Strings>({
           items: ['Comedia', 'Terror', 'Drama', 'Acción', 'Ciencia ficción', 'Animación'],
         },
         { name: 'Tareas', items: ['Platos', 'Ropa', 'Aspirar', 'Basura', 'Compras', 'Baño'] },
+        { name: 'Nombres', items: ['Ana', 'Ben', 'Carla', 'Diego', 'Elena', 'Felix'] },
       ],
     },
     settings: {
