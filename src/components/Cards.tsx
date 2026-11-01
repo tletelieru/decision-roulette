@@ -10,7 +10,8 @@ type Props = { ref: Ref<Stage<number>>; options: Option[] };
 
 type Reveal = { position: number; label: string };
 
-const FLIP_MS = 550;
+const FLIP_MS = 380;
+const MAX_SHUFFLE_MS = 1200;
 
 const FACE = {
   position: 'absolute',
@@ -31,7 +32,7 @@ export default function Cards({ ref, options }: Props) {
       setReveal(null);
       const element = grid.current;
       if (seconds > 0 && element) {
-        const shuffle = seconds * 700;
+        const shuffle = Math.min(seconds * 300, MAX_SHUFFLE_MS);
         const bounds = element.getBoundingClientRect();
         for (const card of Array.from(element.children)) {
           const rect = card.getBoundingClientRect();
@@ -47,7 +48,7 @@ export default function Cards({ ref, options }: Props) {
             { duration: shuffle, easing: 'ease-in-out' },
           );
         }
-        await wait(shuffle + 100);
+        await wait(shuffle);
       }
       setReveal({ position: randomInt(options.length), label: options[index].label });
       if (seconds > 0) await wait(FLIP_MS);
