@@ -36,7 +36,7 @@ export default function Raffle({ ref, options, count, onCount }: Props) {
   }));
 
   return (
-    <Stack spacing={2.5} sx={{ width: '100%', alignItems: 'center', py: 2 }}>
+    <Stack spacing={2.5} sx={{ width: '100%', alignItems: 'center' }}>
       <TextField
         size="small"
         type="number"
@@ -50,7 +50,7 @@ export default function Raffle({ ref, options, count, onCount }: Props) {
         direction="row"
         useFlexGap
         spacing={1}
-        sx={{ flexWrap: 'wrap', justifyContent: 'center', minHeight: 120 }}
+        sx={{ flexWrap: 'wrap', justifyContent: 'center' }}
       >
         {options.map((option, index) => {
           const place = winners.indexOf(index);

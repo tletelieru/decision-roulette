@@ -57,8 +57,8 @@ export default function Coin({ ref }: Props) {
   }));
 
   return (
-    <Box sx={{ width: '100%', display: 'grid', placeItems: 'center', py: 5 }}>
-      <Box ref={toss} sx={{ width: 'min(70%, 280px)', aspectRatio: '1', perspective: 900 }}>
+    <Box sx={{ width: '100%', display: 'grid', placeItems: 'center', py: 2 }}>
+      <Box ref={toss} sx={{ width: 'min(58%, 34dvh, 260px)', aspectRatio: '1', perspective: 900 }}>
         <Box
           ref={coin}
           sx={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d' }}

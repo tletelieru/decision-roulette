@@ -61,7 +61,6 @@ export default function Cards({ ref, options }: Props) {
         width: '100%',
         display: 'grid',
         gap: 1.5,
-        py: 2,
         gridTemplateColumns: 'repeat(auto-fit, minmax(88px, 120px))',
         justifyContent: 'center',
       }}

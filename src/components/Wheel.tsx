@@ -165,7 +165,7 @@ export default function Wheel({ ref, options, sound, disabled, hubLabel, onHub }
   );
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', maxWidth: 520, aspectRatio: '1', mx: 'auto' }}>
+    <Box sx={{ position: 'relative', width: '100%', maxWidth: 'min(520px, 56dvh)', aspectRatio: '1', mx: 'auto' }}>
       <Box
         ref={canvasRef}
         component="canvas"

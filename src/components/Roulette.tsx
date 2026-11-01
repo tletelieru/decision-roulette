@@ -116,7 +116,7 @@ export default function Roulette() {
         alignItems: 'start',
       }}
     >
-      <Stack spacing={2.5} sx={{ alignItems: 'center', minWidth: 0 }}>
+      <Stack spacing={2} sx={{ alignItems: 'center', minWidth: 0 }}>
         <Stack spacing={0.5} sx={{ textAlign: 'center' }}>
           <Typography variant="h2" component="h1" sx={{ fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
             {t.hero.title}
@@ -157,7 +157,7 @@ export default function Roulette() {
           />
         )}
 
-        <Box aria-live="polite" sx={{ width: '100%', maxWidth: 520, minHeight: 92 }}>
+        <Box aria-live="polite" sx={{ width: '100%', maxWidth: 520 }}>
           {result ? (
             <Paper
               elevation={0}
@@ -179,9 +179,11 @@ export default function Roulette() {
               ))}
             </Paper>
           ) : (
-            <Typography color="text.secondary" sx={{ textAlign: 'center', pt: 2 }}>
-              {missingOptions ? t.roulette.needTwo : running ? t.roulette.spinning : ''}
-            </Typography>
+            (missingOptions || running) && (
+              <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
+                {missingOptions ? t.roulette.needTwo : t.roulette.spinning}
+              </Typography>
+            )
           )}
         </Box>
 
@@ -190,7 +192,15 @@ export default function Roulette() {
           size="large"
           disabled={!canRun}
           onClick={() => void run()}
-          sx={{ px: 6 }}
+          sx={{
+            px: 6,
+            width: { xs: '100%', sm: 'auto' },
+            maxWidth: 520,
+            position: { xs: 'sticky', md: 'static' },
+            bottom: 12,
+            zIndex: 2,
+            '&.Mui-disabled': { bgcolor: 'action.disabledBackground', backdropFilter: 'blur(8px)' },
+          }}
         >
           {t.roulette.action[mode]}
         </Button>

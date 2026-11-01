@@ -48,7 +48,7 @@ export default function Dice({ ref, sides, hasOptions, onSides }: Props) {
   }));
 
   return (
-    <Stack spacing={3} sx={{ alignItems: 'center', width: '100%', py: 2 }}>
+    <Stack spacing={1.5} sx={{ alignItems: 'center', width: '100%' }}>
       <ToggleButtonGroup
         exclusive
         size="small"
@@ -64,7 +64,7 @@ export default function Dice({ ref, sides, hasOptions, onSides }: Props) {
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
-      <Box ref={die} sx={{ position: 'relative', width: 'min(70%, 260px)', aspectRatio: '1' }}>
+      <Box ref={die} sx={{ position: 'relative', width: 'min(52%, 30dvh, 240px)', aspectRatio: '1' }}>
         <Box component="svg" viewBox="0 0 100 100" aria-hidden sx={{ display: 'block' }}>
           <polygon
             points={SHAPES[sides]}
