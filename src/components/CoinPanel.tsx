@@ -13,7 +13,7 @@ export default function CoinPanel({ labels, onLabels }: Props) {
   const placeholders = [t.coin.yes, t.coin.no];
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, borderRadius: 4 }}>
+    <Paper variant="outlined" sx={{ p: 2, borderRadius: 1.5 }}>
       <Stack spacing={1.5}>
         <Typography variant="h6" component="h2">
           {t.options.title}
@@ -27,7 +27,7 @@ export default function CoinPanel({ labels, onLabels }: Props) {
               sx={{
                 alignItems: 'center',
                 bgcolor: 'action.hover',
-                borderRadius: 2,
+                borderRadius: 1,
                 px: 1.25,
                 minHeight: 40,
               }}

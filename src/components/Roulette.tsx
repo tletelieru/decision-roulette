@@ -163,7 +163,7 @@ export default function Roulette() {
               elevation={0}
               sx={{
                 p: 2,
-                borderRadius: 4,
+                borderRadius: 1.5,
                 textAlign: 'center',
                 bgcolor: result.color,
                 color: readableText(result.color),

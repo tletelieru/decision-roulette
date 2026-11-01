@@ -90,7 +90,7 @@ export default function OptionsPanel({
   };
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, borderRadius: 4 }}>
+    <Paper variant="outlined" sx={{ p: 2, borderRadius: 1.5 }}>
       <Stack spacing={1.5}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="h6" component="h2">
@@ -119,7 +119,7 @@ export default function OptionsPanel({
               sx={{
                 alignItems: 'center',
                 bgcolor: 'action.hover',
-                borderRadius: 2,
+                borderRadius: 1,
                 pl: 1.25,
                 pr: 0.5,
                 minHeight: 40,

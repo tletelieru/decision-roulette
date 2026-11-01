@@ -13,7 +13,7 @@ export default function SettingsPanel({ settings, onSettings }: Props) {
   const t = useMessages(messages).settings;
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, borderRadius: 4 }}>
+    <Paper variant="outlined" sx={{ p: 2, borderRadius: 1.5 }}>
       <Stack spacing={1}>
         <Typography variant="h6" component="h2">
           {t.title}

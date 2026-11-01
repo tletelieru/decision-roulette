@@ -19,7 +19,7 @@ const FACE = {
   display: 'grid',
   placeItems: 'center',
   p: 1,
-  borderRadius: 3,
+  borderRadius: 1,
   backfaceVisibility: 'hidden',
 } as const;
 
