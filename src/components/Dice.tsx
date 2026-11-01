@@ -24,6 +24,7 @@ type Props = {
   ref: Ref<Stage<number>>;
   sides: number;
   draggable: boolean;
+  disabled: boolean;
   onSides: (sides: number) => void;
   onFling: () => void;
 };
@@ -40,7 +41,7 @@ function shade(hex: string, light: number): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-export default function Dice({ ref, sides, draggable, onSides, onFling }: Props) {
+export default function Dice({ ref, sides, draggable, disabled, onSides, onFling }: Props) {
   const t = useMessages(messages).dice;
   const theme = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -235,6 +236,7 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
       <ToggleButtonGroup
         exclusive
         size="small"
+        disabled={disabled}
         aria-label={t.sides}
         value={sides}
         onChange={(_, next: number | null) => {
