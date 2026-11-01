@@ -144,7 +144,15 @@ export default function OptionsPanel({
                 <InputBase
                   type="number"
                   value={option.weight}
-                  sx={{ width: 56, flexShrink: 0 }}
+                  sx={{
+                    width: 56,
+                    flexShrink: 0,
+                    '& input': { MozAppearance: 'textfield' },
+                    '& input::-webkit-inner-spin-button, & input::-webkit-outer-spin-button': {
+                      WebkitAppearance: 'none',
+                      margin: 0,
+                    },
+                  }}
                   inputProps={{ min: 0, 'aria-label': `${t.weights} ${index + 1}` }}
                   onChange={(event) =>
                     update(option.id, { weight: Math.max(0, Number(event.target.value)) })

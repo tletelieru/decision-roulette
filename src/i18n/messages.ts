@@ -10,7 +10,7 @@ type Strings = {
   modes: Record<Mode, string> & { label: string };
   coin: { yes: string; no: string };
   dice: { sides: string };
-  raffle: { count: string };
+  raffle: { count: string; more: string; fewer: string };
   roulette: {
     spin: string;
     action: Record<Mode, string>;
@@ -72,7 +72,7 @@ export const messages = defineMessages<Strings>({
     },
     coin: { yes: 'Yes', no: 'No' },
     dice: { sides: 'Dice type' },
-    raffle: { count: 'Winners' },
+    raffle: { count: 'Winners', more: 'More winners', fewer: 'Fewer winners' },
     roulette: {
       spin: 'SPIN',
       action: {
@@ -149,7 +149,7 @@ export const messages = defineMessages<Strings>({
     },
     coin: { yes: 'Sí', no: 'No' },
     dice: { sides: 'Tipo de dado' },
-    raffle: { count: 'Ganadores' },
+    raffle: { count: 'Ganadores', more: 'Más ganadores', fewer: 'Menos ganadores' },
     roulette: {
       spin: 'GIRAR',
       action: {

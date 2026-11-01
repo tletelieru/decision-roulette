@@ -120,6 +120,17 @@ describe('App', () => {
     expect(screen.queryByRole('button', { name: 'Remove Movie' })).toBeNull();
   });
 
+  it('limits raffle winners to the option count', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));
+    const fewer = screen.getByRole('button', { name: 'Fewer winners' }) as HTMLButtonElement;
+    const more = screen.getByRole('button', { name: 'More winners' }) as HTMLButtonElement;
+    expect(fewer.disabled).toBe(true);
+    for (let i = 0; i < 5; i += 1) fireEvent.click(more);
+    expect(more.disabled).toBe(true);
+    expect(screen.getByText('6')).toBeTruthy();
+  });
+
   it('adds options and blocks spinning with fewer than two', () => {
     localStorage.setItem('dr-options', '[]');
     render(<App />);

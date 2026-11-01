@@ -1,4 +1,4 @@
-import { Chip, Stack, TextField } from '@mui/material';
+import { Chip, IconButton, Stack, Typography } from '@mui/material';
 import { useImperativeHandle, useState } from 'react';
 import type { Ref } from 'react';
 import { messages } from '../i18n/messages';
@@ -7,6 +7,7 @@ import { wait } from '../lib/modes';
 import type { Stage } from '../lib/modes';
 import type { Option } from '../lib/options';
 import { randomInt } from '../lib/random';
+import { MinusIcon, PlusIcon } from './icons';
 
 type Props = {
   ref: Ref<Stage<number[]>>;
@@ -37,15 +38,33 @@ export default function Raffle({ ref, options, count, onCount }: Props) {
 
   return (
     <Stack spacing={2.5} sx={{ width: '100%', alignItems: 'center' }}>
-      <TextField
-        size="small"
-        type="number"
-        label={t.count}
-        value={count}
-        sx={{ width: 140 }}
-        slotProps={{ htmlInput: { min: 1, max: Math.max(1, options.length) } }}
-        onChange={(event) => onCount(Math.floor(Number(event.target.value)))}
-      />
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          {t.count}
+        </Typography>
+        <IconButton
+          size="small"
+          aria-label={t.fewer}
+          disabled={count <= 1}
+          onClick={() => onCount(count - 1)}
+        >
+          <MinusIcon fontSize="small" />
+        </IconButton>
+        <Typography
+          aria-live="polite"
+          sx={{ minWidth: 24, textAlign: 'center', fontWeight: 700 }}
+        >
+          {count}
+        </Typography>
+        <IconButton
+          size="small"
+          aria-label={t.more}
+          disabled={count >= options.length}
+          onClick={() => onCount(count + 1)}
+        >
+          <PlusIcon fontSize="small" />
+        </IconButton>
+      </Stack>
       <Stack
         direction="row"
         useFlexGap
