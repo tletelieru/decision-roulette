@@ -1,0 +1,566 @@
+import type { Mode } from '../lib/modes';
+import { defineMessages } from './react';
+
+type Strings = {
+  appName: string;
+  toLight: string;
+  toDark: string;
+  language: string;
+  hero: { title: string; subtitle: Record<Mode, string> };
+  modes: Record<Mode, string> & { label: string };
+  coin: { yes: string; no: string };
+  dice: { sides: string };
+  raffle: { count: string; more: string; fewer: string };
+  oracle: { placeholder: string; needQuestion: string };
+  result: { share: string; download: string; withConfetti: string; copied: string };
+  roulette: {
+    spin: string;
+    stop: string;
+    copyLink: string;
+    copied: string;
+    action: Record<Mode, string>;
+    spinning: string;
+    winner: string;
+    needTwo: string;
+  };
+  options: {
+    title: string;
+    option: string;
+    weights: string;
+    remove: string;
+    add: string;
+    addPlaceholder: string;
+    bulk: string;
+    bulkPlaceholder: string;
+    addAll: string;
+    presets: string;
+    loadPreset: string;
+    deletePreset: string;
+    presetName: string;
+    savePreset: string;
+    starterLists: string;
+    starters: { name: string; items: string[] }[];
+  };
+  settings: {
+    title: string;
+    duration: string;
+    instant: string;
+    stopButton: string;
+    sound: string;
+    confetti: string;
+  };
+  footer: { developedBy: string; rights: string };
+};
+
+export const messages = defineMessages<Strings>({
+  en: {
+    appName: 'Decision Maker',
+    toLight: 'Switch to light mode',
+    toDark: 'Switch to dark mode',
+    language: 'Language',
+    hero: {
+      title: 'Let chance decide',
+      subtitle: {
+        wheel: 'Add your options, then spin or drag the wheel.',
+        coin: 'Two sides, one answer.',
+        dice: 'Pick your dice, then roll or drag it.',
+        cards: 'Shuffle the deck and reveal one card.',
+        raffle: 'Draw winners without repeats.',
+        oracle: 'Ask anything. The oracle answers.',
+      },
+    },
+    modes: {
+      label: 'Picker mode',
+      wheel: 'Wheel',
+      coin: 'Coin',
+      dice: 'Dice',
+      cards: 'Cards',
+      raffle: 'Raffle',
+      oracle: 'Oracle',
+    },
+    coin: { yes: 'Yes', no: 'No' },
+    dice: { sides: 'Dice type' },
+    raffle: { count: 'Winners', more: 'More winners', fewer: 'Fewer winners' },
+    oracle: { placeholder: 'Write your question', needQuestion: 'Write a question first.' },
+    result: {
+      share: 'Share result',
+      download: 'Download image',
+      withConfetti: 'With confetti',
+      copied: 'Result copied',
+    },
+    roulette: {
+      spin: 'SPIN',
+      stop: 'Stop',
+      copyLink: 'Copy link',
+      copied: 'Link copied',
+      action: {
+        wheel: 'Spin the wheel',
+        coin: 'Flip the coin',
+        dice: 'Roll the dice',
+        cards: 'Shuffle and draw',
+        raffle: 'Draw winners',
+        oracle: 'Ask the oracle',
+      },
+      spinning: 'Spinning…',
+      winner: 'The result is',
+      needTwo: 'Add at least two options to spin.',
+    },
+    options: {
+      title: 'Options',
+      option: 'Option',
+      weights: 'Weights',
+      remove: 'Remove',
+      add: 'Add option',
+      addPlaceholder: 'Add an option',
+      bulk: 'Paste a list',
+      bulkPlaceholder: 'One option per line',
+      addAll: 'Add all',
+      presets: 'Saved lists',
+      loadPreset: 'Load a list',
+      deletePreset: 'Delete list',
+      presetName: 'List name',
+      savePreset: 'Save',
+      starterLists: 'Quick lists',
+      starters: [
+        {
+          name: 'Plans',
+          items: [
+            'Movie',
+            'Walk',
+            'Read',
+            'Gym',
+            'Games',
+            'Nap',
+            'Cook',
+            'Call a friend',
+            'Beach',
+            'Museum',
+            'Bike ride',
+            'Coffee',
+          ],
+        },
+        {
+          name: 'Food',
+          items: [
+            'Pizza',
+            'Sushi',
+            'Tacos',
+            'Burgers',
+            'Salad',
+            'Pasta',
+            'Ramen',
+            'Curry',
+            'Empanadas',
+            'Sandwich',
+            'Soup',
+            'Barbecue',
+          ],
+        },
+        {
+          name: 'Movies',
+          items: [
+            'Comedy',
+            'Horror',
+            'Drama',
+            'Action',
+            'Sci-fi',
+            'Animation',
+            'Romance',
+            'Thriller',
+            'Fantasy',
+            'Documentary',
+            'Musical',
+            'Western',
+          ],
+        },
+        {
+          name: 'Chores',
+          items: [
+            'Dishes',
+            'Laundry',
+            'Vacuum',
+            'Trash',
+            'Groceries',
+            'Bathroom',
+            'Mop',
+            'Dusting',
+            'Windows',
+            'Change sheets',
+            'Plants',
+            'Kitchen',
+          ],
+        },
+        {
+          name: 'Party',
+          items: [
+            'Truth',
+            'Dare',
+            'Sing',
+            'Dance',
+            'Joke',
+            'Story',
+            'Imitate',
+            'Toast',
+            'Charades',
+            'Compliment',
+            'Secret',
+            'Pass',
+          ],
+        },
+        { name: 'Names', items: ['Ana', 'Ben', 'Carla', 'Diego', 'Elena', 'Felix'] },
+        {
+          name: 'Answers',
+          items: [
+            'Yes',
+            'No',
+            'Probably',
+            'Later',
+            'Maybe',
+            'Definitely',
+            'Unlikely',
+            'Ask again',
+            'Absolutely',
+            'Not now',
+            'Without a doubt',
+            'Better not',
+            'Go for it',
+            'Trust your gut',
+            'Too soon to tell',
+            "Don't count on it",
+            'Signs point to yes',
+            'Very doubtful',
+            'Yes, but be careful',
+            'Not this time',
+            'Sleep on it',
+            'Ask a friend',
+            'The stars say yes',
+            'The stars say no',
+            'Give it a week',
+            'Only if you dare',
+            'All signs say wait',
+            'It is certain',
+            'Outlook not so good',
+            'Focus and ask again',
+            'You already know',
+            'Flip a coin',
+          ],
+        },
+        {
+          name: 'Workout',
+          items: [
+            'Push-ups',
+            'Squats',
+            'Plank',
+            'Lunges',
+            'Burpees',
+            'Jump rope',
+            'Sit-ups',
+            'Pull-ups',
+            'Yoga',
+            'Stretching',
+            'Running',
+            'Weights',
+          ],
+        },
+        {
+          name: 'Hobbies',
+          items: [
+            'Drawing',
+            'Guitar',
+            'Photography',
+            'Baking',
+            'Gardening',
+            'Knitting',
+            'Chess',
+            'Writing',
+            'Painting',
+            'Puzzles',
+            'Video games',
+            'Origami',
+          ],
+        },
+        {
+          name: 'Languages',
+          items: [
+            'English',
+            'Spanish',
+            'French',
+            'German',
+            'Italian',
+            'Portuguese',
+            'Japanese',
+            'Korean',
+            'Chinese',
+            'Arabic',
+            'Russian',
+            'Hindi',
+          ],
+        },
+      ],
+    },
+    settings: {
+      title: 'Settings',
+      duration: 'Spin duration',
+      instant: 'Instant result',
+      stopButton: 'Stop button',
+      sound: 'Sound',
+      confetti: 'Confetti',
+    },
+    footer: { developedBy: 'Developed by', rights: 'All rights reserved.' },
+  },
+  es: {
+    appName: 'Decision Maker',
+    toLight: 'Cambiar a modo claro',
+    toDark: 'Cambiar a modo oscuro',
+    language: 'Idioma',
+    hero: {
+      title: 'Deja que el azar decida',
+      subtitle: {
+        wheel: 'Agrega tus opciones y gira o arrastra la ruleta.',
+        coin: 'Dos caras, una respuesta.',
+        dice: 'Elige un dado y lánzalo o arrástralo.',
+        cards: 'Baraja el mazo y revela una carta.',
+        raffle: 'Sortea ganadores sin repetir.',
+        oracle: 'Pregunta lo que quieras. El oráculo responde.',
+      },
+    },
+    modes: {
+      label: 'Modo de selección',
+      wheel: 'Ruleta',
+      coin: 'Moneda',
+      dice: 'Dados',
+      cards: 'Cartas',
+      raffle: 'Sorteo',
+      oracle: 'Oráculo',
+    },
+    coin: { yes: 'Sí', no: 'No' },
+    dice: { sides: 'Tipo de dado' },
+    raffle: { count: 'Ganadores', more: 'Más ganadores', fewer: 'Menos ganadores' },
+    oracle: { placeholder: 'Escribe tu pregunta', needQuestion: 'Escribe una pregunta primero.' },
+    result: {
+      share: 'Compartir resultado',
+      download: 'Descargar imagen',
+      withConfetti: 'Con confeti',
+      copied: 'Resultado copiado',
+    },
+    roulette: {
+      spin: 'GIRAR',
+      stop: 'Detener',
+      copyLink: 'Copiar enlace',
+      copied: 'Enlace copiado',
+      action: {
+        wheel: 'Girar la ruleta',
+        coin: 'Lanzar la moneda',
+        dice: 'Lanzar el dado',
+        cards: 'Barajar y sacar',
+        raffle: 'Sortear ganadores',
+        oracle: 'Preguntar al oráculo',
+      },
+      spinning: 'Girando…',
+      winner: 'El resultado es',
+      needTwo: 'Agrega al menos dos opciones para girar.',
+    },
+    options: {
+      title: 'Opciones',
+      option: 'Opción',
+      weights: 'Pesos',
+      remove: 'Quitar',
+      add: 'Agregar opción',
+      addPlaceholder: 'Agrega una opción',
+      bulk: 'Pegar una lista',
+      bulkPlaceholder: 'Una opción por línea',
+      addAll: 'Agregar todas',
+      presets: 'Listas guardadas',
+      loadPreset: 'Cargar una lista',
+      deletePreset: 'Borrar lista',
+      presetName: 'Nombre de la lista',
+      savePreset: 'Guardar',
+      starterLists: 'Listas rápidas',
+      starters: [
+        {
+          name: 'Planes',
+          items: [
+            'Cine',
+            'Paseo',
+            'Leer',
+            'Gimnasio',
+            'Juegos',
+            'Siesta',
+            'Cocinar',
+            'Llamar a alguien',
+            'Playa',
+            'Museo',
+            'Bicicleta',
+            'Café',
+          ],
+        },
+        {
+          name: 'Comida',
+          items: [
+            'Pizza',
+            'Sushi',
+            'Tacos',
+            'Hamburguesas',
+            'Ensalada',
+            'Pasta',
+            'Ramen',
+            'Curry',
+            'Empanadas',
+            'Sándwich',
+            'Sopa',
+            'Asado',
+          ],
+        },
+        {
+          name: 'Películas',
+          items: [
+            'Comedia',
+            'Terror',
+            'Drama',
+            'Acción',
+            'Ciencia ficción',
+            'Animación',
+            'Romance',
+            'Suspenso',
+            'Fantasía',
+            'Documental',
+            'Musical',
+            'Western',
+          ],
+        },
+        {
+          name: 'Tareas',
+          items: [
+            'Platos',
+            'Ropa',
+            'Aspirar',
+            'Basura',
+            'Compras',
+            'Baño',
+            'Trapear',
+            'Sacudir',
+            'Ventanas',
+            'Cambiar sábanas',
+            'Plantas',
+            'Cocina',
+          ],
+        },
+        {
+          name: 'Fiesta',
+          items: [
+            'Verdad',
+            'Reto',
+            'Cantar',
+            'Bailar',
+            'Chiste',
+            'Historia',
+            'Imitar',
+            'Brindis',
+            'Mímica',
+            'Cumplido',
+            'Secreto',
+            'Pasar',
+          ],
+        },
+        { name: 'Nombres', items: ['Ana', 'Ben', 'Carla', 'Diego', 'Elena', 'Felix'] },
+        {
+          name: 'Respuestas',
+          items: [
+            'Sí',
+            'No',
+            'Probablemente',
+            'Más tarde',
+            'Quizás',
+            'Definitivamente',
+            'Poco probable',
+            'Pregunta otra vez',
+            'Por supuesto',
+            'Ahora no',
+            'Sin duda',
+            'Mejor no',
+            'Adelante',
+            'Confía en tu instinto',
+            'Aún es pronto',
+            'No cuentes con ello',
+            'Todo apunta a que sí',
+            'Muy dudoso',
+            'Sí, pero con cuidado',
+            'Esta vez no',
+            'Consúltalo con la almohada',
+            'Pregúntale a alguien',
+            'Las estrellas dicen que sí',
+            'Las estrellas dicen que no',
+            'Dale una semana',
+            'Solo si te atreves',
+            'Las señales dicen espera',
+            'Es seguro',
+            'No pinta bien',
+            'Concéntrate y pregunta otra vez',
+            'Ya sabes la respuesta',
+            'Lanza una moneda',
+          ],
+        },
+        {
+          name: 'Ejercicio',
+          items: [
+            'Flexiones',
+            'Sentadillas',
+            'Plancha',
+            'Zancadas',
+            'Burpees',
+            'Saltar la cuerda',
+            'Abdominales',
+            'Dominadas',
+            'Yoga',
+            'Estiramientos',
+            'Correr',
+            'Pesas',
+          ],
+        },
+        {
+          name: 'Pasatiempos',
+          items: [
+            'Dibujar',
+            'Guitarra',
+            'Fotografía',
+            'Repostería',
+            'Jardinería',
+            'Tejer',
+            'Ajedrez',
+            'Escribir',
+            'Pintar',
+            'Puzzles',
+            'Videojuegos',
+            'Origami',
+          ],
+        },
+        {
+          name: 'Idiomas',
+          items: [
+            'Inglés',
+            'Español',
+            'Francés',
+            'Alemán',
+            'Italiano',
+            'Portugués',
+            'Japonés',
+            'Coreano',
+            'Chino',
+            'Árabe',
+            'Ruso',
+            'Hindi',
+          ],
+        },
+      ],
+    },
+    settings: {
+      title: 'Ajustes',
+      duration: 'Duración del giro',
+      instant: 'Resultado instantáneo',
+      stopButton: 'Botón de detener',
+      sound: 'Sonido',
+      confetti: 'Confeti',
+    },
+    footer: { developedBy: 'Desarrollado por', rights: 'Todos los derechos reservados.' },
+  },
+});
