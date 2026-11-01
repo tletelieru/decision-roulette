@@ -185,6 +185,32 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Remove Dare' })).toBeTruthy();
   });
 
+  it('answers a written question from its own list', async () => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 5,
+        instant: true,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Oracle' }));
+    const ask = screen.getByRole('button', { name: 'Ask the oracle' }) as HTMLButtonElement;
+    expect(ask.disabled).toBe(true);
+    expect(screen.getByRole('button', { name: 'Remove Probably' })).toBeTruthy();
+    fireEvent.change(screen.getByRole('textbox', { name: 'Write your question' }), {
+      target: { value: 'Will it rain?' },
+    });
+    expect(ask.disabled).toBe(false);
+    fireEvent.click(ask);
+    expect(await screen.findByText('The result is')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Wheel' }));
+    expect(screen.queryByRole('button', { name: 'Remove Probably' })).toBeNull();
+  });
+
   it('limits raffle winners to the option count', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));

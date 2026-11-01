@@ -1,4 +1,4 @@
-export const modes = ['wheel', 'coin', 'dice', 'cards', 'raffle'] as const;
+export const modes = ['wheel', 'coin', 'dice', 'cards', 'raffle', 'oracle'] as const;
 
 export type Mode = (typeof modes)[number];
 

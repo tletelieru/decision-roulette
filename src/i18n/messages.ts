@@ -11,6 +11,7 @@ type Strings = {
   coin: { yes: string; no: string };
   dice: { sides: string };
   raffle: { count: string; more: string; fewer: string };
+  oracle: { placeholder: string; needQuestion: string };
   roulette: {
     spin: string;
     stop: string;
@@ -62,6 +63,7 @@ export const messages = defineMessages<Strings>({
         dice: 'Pick your dice and roll.',
         cards: 'Shuffle the deck and reveal one card.',
         raffle: 'Draw winners without repeats.',
+        oracle: 'Ask anything. The oracle answers.',
       },
     },
     modes: {
@@ -71,10 +73,12 @@ export const messages = defineMessages<Strings>({
       dice: 'Dice',
       cards: 'Cards',
       raffle: 'Raffle',
+      oracle: 'Oracle',
     },
     coin: { yes: 'Yes', no: 'No' },
     dice: { sides: 'Dice type' },
     raffle: { count: 'Winners', more: 'More winners', fewer: 'Fewer winners' },
+    oracle: { placeholder: 'Write your question', needQuestion: 'Write a question first.' },
     roulette: {
       spin: 'SPIN',
       stop: 'Stop',
@@ -84,6 +88,7 @@ export const messages = defineMessages<Strings>({
         dice: 'Roll the dice',
         cards: 'Shuffle and draw',
         raffle: 'Draw winners',
+        oracle: 'Ask the oracle',
       },
       spinning: 'Spinning…',
       winner: 'The result is',
@@ -118,6 +123,10 @@ export const messages = defineMessages<Strings>({
         },
         { name: 'Party', items: ['Truth', 'Dare', 'Sing', 'Dance', 'Joke', 'Story'] },
         { name: 'Names', items: ['Ana', 'Ben', 'Carla', 'Diego', 'Elena', 'Felix'] },
+        {
+          name: 'Answers',
+          items: ['Yes', 'No', 'Probably', 'Later', 'Maybe', 'Definitely', 'Unlikely', 'Ask again'],
+        },
       ],
     },
     settings: {
@@ -143,6 +152,7 @@ export const messages = defineMessages<Strings>({
         dice: 'Elige un dado y lánzalo.',
         cards: 'Baraja el mazo y revela una carta.',
         raffle: 'Sortea ganadores sin repetir.',
+        oracle: 'Pregunta lo que quieras. El oráculo responde.',
       },
     },
     modes: {
@@ -152,10 +162,12 @@ export const messages = defineMessages<Strings>({
       dice: 'Dados',
       cards: 'Cartas',
       raffle: 'Sorteo',
+      oracle: 'Oráculo',
     },
     coin: { yes: 'Sí', no: 'No' },
     dice: { sides: 'Tipo de dado' },
     raffle: { count: 'Ganadores', more: 'Más ganadores', fewer: 'Menos ganadores' },
+    oracle: { placeholder: 'Escribe tu pregunta', needQuestion: 'Escribe una pregunta primero.' },
     roulette: {
       spin: 'GIRAR',
       stop: 'Detener',
@@ -165,6 +177,7 @@ export const messages = defineMessages<Strings>({
         dice: 'Lanzar el dado',
         cards: 'Barajar y sacar',
         raffle: 'Sortear ganadores',
+        oracle: 'Preguntar al oráculo',
       },
       spinning: 'Girando…',
       winner: 'El resultado es',
@@ -199,6 +212,19 @@ export const messages = defineMessages<Strings>({
         { name: 'Tareas', items: ['Platos', 'Ropa', 'Aspirar', 'Basura', 'Compras', 'Baño'] },
         { name: 'Fiesta', items: ['Verdad', 'Reto', 'Cantar', 'Bailar', 'Chiste', 'Historia'] },
         { name: 'Nombres', items: ['Ana', 'Ben', 'Carla', 'Diego', 'Elena', 'Felix'] },
+        {
+          name: 'Respuestas',
+          items: [
+            'Sí',
+            'No',
+            'Probablemente',
+            'Más tarde',
+            'Quizás',
+            'Definitivamente',
+            'Poco probable',
+            'Pregunta otra vez',
+          ],
+        },
       ],
     },
     settings: {

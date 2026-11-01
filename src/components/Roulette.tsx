@@ -17,6 +17,7 @@ import Coin from './Coin';
 import CoinPanel from './CoinPanel';
 import Dice from './Dice';
 import ModeTabs from './ModeTabs';
+import Oracle from './Oracle';
 import OptionsPanel from './OptionsPanel';
 import Raffle from './Raffle';
 import SettingsPanel from './SettingsPanel';
@@ -26,9 +27,11 @@ import type { WheelHandle } from './Wheel';
 const OPTIONS_KEY = 'dr-options';
 const RAFFLE_KEY = 'dr-raffle';
 const CARDS_KEY = 'dr-cards';
+const ORACLE_KEY = 'dr-oracle';
 const WHEEL_STARTER = 0;
 const CARDS_STARTER = 4;
 const RAFFLE_STARTER = 5;
+const ORACLE_STARTER = 6;
 const PRESETS_KEY = 'dr-presets';
 const SETTINGS_KEY = 'dr-settings';
 
@@ -49,6 +52,10 @@ export default function Roulette() {
   const [names, setNames] = useState<Option[]>(() =>
     load(RAFFLE_KEY, isOptionList, starter(RAFFLE_STARTER)),
   );
+  const [answers, setAnswers] = useState<Option[]>(() =>
+    load(ORACLE_KEY, isOptionList, starter(ORACLE_STARTER)),
+  );
+  const [question, setQuestion] = useState('');
   const [presets, setPresets] = useState<Preset[]>(() => load(PRESETS_KEY, isPresetList, []));
   const [settings, setSettings] = useState<Settings>(() =>
     restoreSettings(load(SETTINGS_KEY, isSettings, defaultSettings)),
@@ -62,12 +69,17 @@ export default function Roulette() {
   const dice = useRef<Stage<number>>(null);
   const cards = useRef<Stage<number>>(null);
   const raffle = useRef<Stage<number[]>>(null);
-  const list = settings.mode === 'raffle' ? names : settings.mode === 'cards' ? deck : options;
+  const oracle = useRef<Stage<number>>(null);
+  const lists = { raffle: names, cards: deck, oracle: answers };
+  const setters = { raffle: setNames, cards: setDeck, oracle: setAnswers };
+  const listMode = settings.mode as keyof typeof lists;
+  const list = lists[listMode] ?? options;
   const active = useMemo(() => activeOptions(list), [list]);
   const activeKey = active.map((option) => option.id).join();
   const { mode } = settings;
   const missingOptions = needsOptions(mode) && active.length < 2;
-  const canRun = !missingOptions && !running;
+  const missingQuestion = mode === 'oracle' && !question.trim();
+  const canRun = !missingOptions && !missingQuestion && !running;
   const canStop = running && settings.stopButton && !stopping;
   const stopLabel = running && settings.stopButton;
   const winners = Math.min(Math.max(1, settings.winners), Math.max(1, active.length));
@@ -75,6 +87,7 @@ export default function Roulette() {
   useEffect(() => save(OPTIONS_KEY, options), [options]);
   useEffect(() => save(RAFFLE_KEY, names), [names]);
   useEffect(() => save(CARDS_KEY, deck), [deck]);
+  useEffect(() => save(ORACLE_KEY, answers), [answers]);
   useEffect(() => save(PRESETS_KEY, presets), [presets]);
   useEffect(() => save(SETTINGS_KEY, settings), [settings]);
 
@@ -112,6 +125,7 @@ export default function Roulette() {
     }
     const index = pickWeightedIndex(weights);
     if (mode === 'cards') await cards.current?.run(index, seconds, signal);
+    else if (mode === 'oracle') await oracle.current?.run(index, seconds, signal);
     else await wheel.current?.spin(index, seconds, signal);
     return { lines: [active[index].label], color: sliceColor(index, active.length) };
   };
@@ -185,6 +199,17 @@ export default function Roulette() {
           />
         )}
 
+        {mode === 'oracle' && (
+          <Oracle
+            key={activeKey}
+            ref={oracle}
+            options={active}
+            question={question}
+            disabled={running}
+            onQuestion={setQuestion}
+          />
+        )}
+
         <Box aria-live="polite" sx={{ width: '100%', maxWidth: 520 }}>
           {result ? (
             <Paper
@@ -207,9 +232,13 @@ export default function Roulette() {
               ))}
             </Paper>
           ) : (
-            (missingOptions || running) && (
+            (missingOptions || missingQuestion || running) && (
               <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
-                {missingOptions ? t.roulette.needTwo : t.roulette.spinning}
+                {missingOptions
+                  ? t.roulette.needTwo
+                  : missingQuestion
+                    ? t.oracle.needQuestion
+                    : t.roulette.spinning}
               </Typography>
             )
           )}
@@ -245,7 +274,7 @@ export default function Roulette() {
             options={list}
             presets={presets}
             showWeights={settings.showWeights}
-            onOptions={mode === 'raffle' ? setNames : mode === 'cards' ? setDeck : setOptions}
+            onOptions={setters[listMode] ?? setOptions}
             onPresets={setPresets}
             onShowWeights={(showWeights) => update({ showWeights })}
           />
