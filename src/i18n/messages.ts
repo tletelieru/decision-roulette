@@ -17,7 +17,6 @@ type Strings = {
     spinning: string;
     winner: string;
     needTwo: string;
-    defaults: string[];
   };
   options: {
     title: string;
@@ -34,6 +33,8 @@ type Strings = {
     deletePreset: string;
     presetName: string;
     savePreset: string;
+    starterLists: string;
+    starters: { name: string; items: string[] }[];
   };
   settings: {
     title: string;
@@ -88,7 +89,6 @@ export const messages = defineMessages<Strings>({
       spinning: 'Spinning…',
       winner: 'The result is',
       needTwo: 'Add at least two options to spin.',
-      defaults: ['Pizza', 'Sushi', 'Tacos', 'Burgers', 'Salad', 'Pasta'],
     },
     options: {
       title: 'Options',
@@ -105,6 +105,19 @@ export const messages = defineMessages<Strings>({
       deletePreset: 'Delete list',
       presetName: 'List name',
       savePreset: 'Save',
+      starterLists: 'Quick lists',
+      starters: [
+        { name: 'Plans', items: ['Movie', 'Walk', 'Read', 'Gym', 'Games', 'Nap'] },
+        { name: 'Food', items: ['Pizza', 'Sushi', 'Tacos', 'Burgers', 'Salad', 'Pasta'] },
+        {
+          name: 'Movies',
+          items: ['Comedy', 'Horror', 'Drama', 'Action', 'Sci-fi', 'Animation'],
+        },
+        {
+          name: 'Chores',
+          items: ['Dishes', 'Laundry', 'Vacuum', 'Trash', 'Groceries', 'Bathroom'],
+        },
+      ],
     },
     settings: {
       title: 'Settings',
@@ -157,7 +170,6 @@ export const messages = defineMessages<Strings>({
       spinning: 'Girando…',
       winner: 'El resultado es',
       needTwo: 'Agrega al menos dos opciones para girar.',
-      defaults: ['Pizza', 'Sushi', 'Tacos', 'Hamburguesas', 'Ensalada', 'Pasta'],
     },
     options: {
       title: 'Opciones',
@@ -174,6 +186,19 @@ export const messages = defineMessages<Strings>({
       deletePreset: 'Borrar lista',
       presetName: 'Nombre de la lista',
       savePreset: 'Guardar',
+      starterLists: 'Listas rápidas',
+      starters: [
+        { name: 'Planes', items: ['Cine', 'Paseo', 'Leer', 'Gimnasio', 'Juegos', 'Siesta'] },
+        {
+          name: 'Comida',
+          items: ['Pizza', 'Sushi', 'Tacos', 'Hamburguesas', 'Ensalada', 'Pasta'],
+        },
+        {
+          name: 'Películas',
+          items: ['Comedia', 'Terror', 'Drama', 'Acción', 'Ciencia ficción', 'Animación'],
+        },
+        { name: 'Tareas', items: ['Platos', 'Ropa', 'Aspirar', 'Basura', 'Compras', 'Baño'] },
+      ],
     },
     settings: {
       title: 'Ajustes',

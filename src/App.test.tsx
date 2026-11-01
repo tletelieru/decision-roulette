@@ -81,7 +81,7 @@ describe('App', () => {
     );
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Coin' }));
-    expect(screen.queryByRole('button', { name: 'Remove Pizza' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Remove Movie' })).toBeNull();
     for (const [name, value] of [
       ['Option 1', 'Heads'],
       ['Option 2', 'Heads'],
@@ -107,10 +107,17 @@ describe('App', () => {
     );
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Dice' }));
-    expect(screen.queryByRole('button', { name: 'Remove Pizza' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Remove Movie' })).toBeNull();
     fireEvent.click(screen.getByRole('switch', { name: 'Use my options' }));
-    expect(screen.getByText('1 → Pizza')).toBeTruthy();
+    expect(screen.getByText('1 → Movie')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Remove Movie' })).toBeTruthy();
+  });
+
+  it('loads a quick list', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Food' }));
     expect(screen.getByRole('button', { name: 'Remove Pizza' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Remove Movie' })).toBeNull();
   });
 
   it('adds options and blocks spinning with fewer than two', () => {

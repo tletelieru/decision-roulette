@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Chip,
   Collapse,
   IconButton,
   InputBase,
@@ -205,6 +206,21 @@ export default function OptionsPanel({
         <Box sx={{ borderTop: 1, borderColor: 'divider', pt: 1.5 }}>
           <Stack spacing={1}>
             <Typography variant="subtitle2" component="h3">
+              {t.starterLists}
+            </Typography>
+            <Stack direction="row" useFlexGap spacing={0.75} sx={{ flexWrap: 'wrap' }}>
+              {t.starters.map((starter) => (
+                <Chip
+                  key={starter.name}
+                  clickable
+                  size="small"
+                  variant="outlined"
+                  label={starter.name}
+                  onClick={() => onOptions(starter.items.map((label) => createOption(label)))}
+                />
+              ))}
+            </Stack>
+            <Typography variant="subtitle2" component="h3" sx={{ pt: 0.5 }}>
               {t.presets}
             </Typography>
             {presets.length > 0 && (

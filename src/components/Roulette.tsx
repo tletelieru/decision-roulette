@@ -34,7 +34,7 @@ type Result = { lines: string[]; color: string };
 export default function Roulette() {
   const t = useMessages(messages);
   const [options, setOptions] = useState<Option[]>(() =>
-    load(OPTIONS_KEY, isOptionList, t.roulette.defaults.map((label) => createOption(label))),
+    load(OPTIONS_KEY, isOptionList, t.options.starters[0].items.map((label) => createOption(label))),
   );
   const [presets, setPresets] = useState<Preset[]>(() => load(PRESETS_KEY, isPresetList, []));
   const [settings, setSettings] = useState<Settings>(() =>
