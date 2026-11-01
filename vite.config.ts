@@ -16,8 +16,8 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Decision Roulette',
-        short_name: 'Roulette',
+        name: 'Decision Maker',
+        short_name: 'Decisions',
         description: 'Make random decisions with a wheel, slots, cards, coins and dice.',
         theme_color: '#17181c',
         background_color: '#17181c',

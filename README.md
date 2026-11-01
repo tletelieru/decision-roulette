@@ -1,4 +1,4 @@
-# Decision Roulette
+# Decision Maker
 
 Make random decisions with a wheel, slot machine, cards, coins, dice, elimination rounds, brackets and raffles. Runs entirely in the browser and works offline as a PWA.
 

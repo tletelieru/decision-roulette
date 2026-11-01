@@ -53,7 +53,7 @@ type Strings = {
 
 export const messages = defineMessages<Strings>({
   en: {
-    appName: 'Decision Roulette',
+    appName: 'Decision Maker',
     toLight: 'Switch to light mode',
     toDark: 'Switch to dark mode',
     language: 'Language',
@@ -144,7 +144,7 @@ export const messages = defineMessages<Strings>({
     footer: { developedBy: 'Developed by' },
   },
   es: {
-    appName: 'Ruleta de Decisiones',
+    appName: 'Decision Maker',
     toLight: 'Cambiar a modo claro',
     toDark: 'Cambiar a modo oscuro',
     language: 'Idioma',
