@@ -9,7 +9,7 @@ type Strings = {
   hero: { title: string; subtitle: Record<Mode, string> };
   modes: Record<Mode, string> & { label: string };
   coin: { yes: string; no: string };
-  dice: { sides: string; mapped: string };
+  dice: { sides: string; useOptions: string; tooMany: string };
   raffle: { count: string };
   roulette: {
     spin: string;
@@ -56,7 +56,7 @@ export const messages = defineMessages<Strings>({
       subtitle: {
         wheel: 'Add your options and spin.',
         coin: 'Two sides, one answer.',
-        dice: 'Roll a die, with or without options.',
+        dice: 'Pick a die and roll.',
         cards: 'Shuffle the deck and reveal one card.',
         raffle: 'Draw winners without repeats.',
       },
@@ -70,7 +70,11 @@ export const messages = defineMessages<Strings>({
       raffle: 'Raffle',
     },
     coin: { yes: 'Yes', no: 'No' },
-    dice: { sides: 'Die type', mapped: 'Each number maps to your options, in order.' },
+    dice: {
+      sides: 'Die type',
+      useOptions: 'Use my options',
+      tooMany: 'This die only reaches the first {count} options.',
+    },
     raffle: { count: 'Winners' },
     roulette: {
       spin: 'SPIN',
@@ -121,7 +125,7 @@ export const messages = defineMessages<Strings>({
       subtitle: {
         wheel: 'Agrega tus opciones y gira.',
         coin: 'Dos caras, una respuesta.',
-        dice: 'Lanza un dado, con o sin opciones.',
+        dice: 'Elige un dado y lánzalo.',
         cards: 'Baraja el mazo y revela una carta.',
         raffle: 'Sortea ganadores sin repetir.',
       },
@@ -135,7 +139,11 @@ export const messages = defineMessages<Strings>({
       raffle: 'Sorteo',
     },
     coin: { yes: 'Sí', no: 'No' },
-    dice: { sides: 'Tipo de dado', mapped: 'Cada número corresponde a tus opciones, en orden.' },
+    dice: {
+      sides: 'Tipo de dado',
+      useOptions: 'Usar mis opciones',
+      tooMany: 'Este dado solo alcanza las primeras {count} opciones.',
+    },
     raffle: { count: 'Ganadores' },
     roulette: {
       spin: 'GIRAR',

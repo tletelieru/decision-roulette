@@ -94,6 +94,25 @@ describe('App', () => {
     expect(screen.getAllByText('Heads').length).toBeGreaterThanOrEqual(3);
   });
 
+  it('rolls plain numbers until options are switched on', () => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 5,
+        instant: true,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Dice' }));
+    expect(screen.queryByRole('button', { name: 'Remove Pizza' })).toBeNull();
+    fireEvent.click(screen.getByRole('switch', { name: 'Use my options' }));
+    expect(screen.getByText('1 → Pizza')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Remove Pizza' })).toBeTruthy();
+  });
+
   it('adds options and blocks spinning with fewer than two', () => {
     localStorage.setItem('dr-options', '[]');
     render(<App />);

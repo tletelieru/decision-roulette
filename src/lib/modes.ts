@@ -14,4 +14,10 @@ export const needsOptions = (mode: Mode) => mode !== 'coin' && mode !== 'dice';
 
 export const diceOption = (value: number, count: number) => (value - 1) % count;
 
+export function diceNumbers(option: number, count: number, sides: number): number[] {
+  return Array.from({ length: sides }, (_, index) => index + 1).filter(
+    (value) => diceOption(value, count) === option,
+  );
+}
+
 export const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));

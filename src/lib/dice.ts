@@ -6,7 +6,7 @@ export type Face = { points: number[]; center: Vec; normal: Vec; up: Vec; value:
 export type Solid = { vertices: Vec[]; faces: Face[] };
 
 const PHI = (1 + Math.sqrt(5)) / 2;
-const REST_TILT = { x: 0.42, y: -0.34 };
+const REST_TILT = { x: 0.3, y: -0.24 };
 const STRIDE: Record<number, number> = { 4: 1, 6: 5, 8: 3, 12: 5, 20: 7 };
 
 const add = (a: Vec, b: Vec): Vec => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];

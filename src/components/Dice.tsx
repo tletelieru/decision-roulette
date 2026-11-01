@@ -1,18 +1,31 @@
-import { Box, Stack, ToggleButton, ToggleButtonGroup, Typography, useTheme } from '@mui/material';
-import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import {
+  Box,
+  Chip,
+  FormControlLabel,
+  Stack,
+  Switch,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+  useTheme,
+} from '@mui/material';
+import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { Ref } from 'react';
 import { messages } from '../i18n/messages';
 import { useMessages } from '../i18n/react';
 import { dot, normalize, planRoll, restingRotation, rollAt, rotate, solidFor } from '../lib/dice';
 import type { Quat, Vec } from '../lib/dice';
-import { diceSides } from '../lib/modes';
+import { diceNumbers, diceSides } from '../lib/modes';
 import type { Stage } from '../lib/modes';
+import type { Option } from '../lib/options';
 
 type Props = {
   ref: Ref<Stage<number>>;
   sides: number;
-  hasOptions: boolean;
+  options: Option[];
+  useOptions: boolean;
   onSides: (sides: number) => void;
+  onUseOptions: (use: boolean) => void;
 };
 
 const LIGHT = normalize([-0.45, 0.6, 0.75]);
@@ -25,14 +38,16 @@ function shade(hex: string, light: number): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-export default function Dice({ ref, sides, hasOptions, onSides }: Props) {
+export default function Dice({ ref, sides, options, useOptions, onSides, onUseOptions }: Props) {
   const t = useMessages(messages).dice;
   const theme = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const orientation = useRef<Quat>(restingRotation(solidFor(sides), sides));
   const frame = useRef(0);
+  const [rolled, setRolled] = useState<number | null>(null);
   const color = theme.palette.primary.main;
   const ink = theme.palette.primary.contrastText;
+  const dark = theme.palette.mode === 'dark';
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -57,22 +72,42 @@ export default function Dice({ ref, sides, hasOptions, onSides }: Props) {
       return [center + point[0] * radius * lens, center - point[1] * radius * lens];
     };
     const corners = solid.vertices.map((vertex) => rotate(q, vertex));
-
-    for (const face of solid.faces) {
-      const normal = rotate(q, face.normal);
-      if (normal[2] <= 0.02) continue;
-      const points = face.points.map((index) => project(corners[index]));
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const visible = solid.faces
+      .map((face) => ({ face, normal: rotate(q, face.normal) }))
+      .filter(({ normal }) => normal[2] > 0.02);
+    const outline = (points: number[]) => {
       ctx.beginPath();
-      points.forEach(([x, y], index) => (index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      points
+        .map((index) => project(corners[index]))
+        .forEach(([x, y], index) => (index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
       ctx.closePath();
-      ctx.fillStyle = shade(color, 0.5 + 0.62 * Math.max(0, dot(normal, LIGHT)));
+    };
+
+    ctx.lineJoin = 'round';
+    for (const { face, normal } of visible) {
+      const light = 0.5 + 0.62 * Math.max(0, dot(normal, LIGHT));
+      const muted = rolled !== null && face.value !== rolled;
+      outline(face.points);
+      if (face.value === rolled) ctx.fillStyle = color;
+      else ctx.fillStyle = shade(muted ? (dark ? '#4a4c56' : '#c4c5cc') : color, light);
       ctx.fill();
-      ctx.lineJoin = 'round';
       ctx.lineWidth = Math.max(1.5, size * 0.008);
       ctx.strokeStyle = 'rgba(255,255,255,0.42)';
       ctx.stroke();
+    }
 
+    const winner = visible.find(({ face }) => face.value === rolled);
+    if (winner) {
+      outline(winner.face.points);
+      ctx.lineWidth = Math.max(3, size * 0.016);
+      ctx.strokeStyle = dark ? '#ffffff' : '#17181c';
+      ctx.stroke();
+    }
+
+    ctx.font = `800 ${FONT_SCALE[sides] * 100}px Inter, ui-sans-serif, system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const { face, normal } of visible) {
       const mid = rotate(q, face.center);
       const up = rotate(q, face.up);
       const right: Vec = [
@@ -90,14 +125,12 @@ export default function Dice({ ref, sides, hasOptions, onSides }: Props) {
         ratio * x,
         ratio * y,
       );
-      ctx.font = `800 ${FONT_SCALE[sides] * 100}px Inter, ui-sans-serif, system-ui, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = ink;
+      const muted = rolled !== null && face.value !== rolled;
+      ctx.fillStyle = muted ? (dark ? '#c9cad1' : '#4a4c56') : ink;
       const marked = sides > 6 && (face.value === 6 || face.value === 9);
       ctx.fillText(marked ? `${face.value}.` : `${face.value}`, 0, 2);
     }
-  }, [color, ink, sides]);
+  }, [color, dark, ink, rolled, sides]);
 
   useEffect(() => {
     draw();
@@ -116,9 +149,10 @@ export default function Dice({ ref, sides, hasOptions, onSides }: Props) {
       run: (value, seconds) =>
         new Promise((resolve) => {
           const end = restingRotation(solidFor(sides), value);
+          setRolled(null);
           if (seconds <= 0) {
             orientation.current = end;
-            draw();
+            setRolled(value);
             resolve();
             return;
           }
@@ -140,14 +174,20 @@ export default function Dice({ ref, sides, hasOptions, onSides }: Props) {
             const progress = Math.min(1, (now - startedAt) / total);
             orientation.current = rollAt(roll, progress);
             draw();
-            if (progress < 1) frame.current = requestAnimationFrame(step);
-            else resolve();
+            if (progress < 1) {
+              frame.current = requestAnimationFrame(step);
+              return;
+            }
+            setRolled(value);
+            resolve();
           };
           frame.current = requestAnimationFrame(step);
         }),
     }),
     [draw, sides],
   );
+
+  const reached = options.slice(0, sides);
 
   return (
     <Stack spacing={1.5} sx={{ alignItems: 'center', width: '100%' }}>
@@ -178,10 +218,44 @@ export default function Dice({ ref, sides, hasOptions, onSides }: Props) {
           filter: 'drop-shadow(0 14px 16px rgba(0,0,0,0.3))',
         }}
       />
-      {hasOptions && (
-        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-          {t.mapped}
-        </Typography>
+      <FormControlLabel
+        control={
+          <Switch
+            size="small"
+            checked={useOptions}
+            onChange={(event) => onUseOptions(event.target.checked)}
+          />
+        }
+        label={<Typography variant="body2">{t.useOptions}</Typography>}
+      />
+      {useOptions && options.length > 0 && (
+        <Stack spacing={1} sx={{ alignItems: 'center', width: '100%' }}>
+          <Stack
+            direction="row"
+            useFlexGap
+            spacing={0.75}
+            sx={{ flexWrap: 'wrap', justifyContent: 'center' }}
+          >
+            {reached.map((option, index) => {
+              const numbers = diceNumbers(index, options.length, sides);
+              const won = rolled !== null && numbers.includes(rolled);
+              return (
+                <Chip
+                  key={option.id}
+                  size="small"
+                  label={`${numbers.join(', ')} → ${option.label}`}
+                  color={won ? 'primary' : 'default'}
+                  variant={won ? 'filled' : 'outlined'}
+                />
+              );
+            })}
+          </Stack>
+          {options.length > sides && (
+            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+              {t.tooMany.replace('{count}', String(sides))}
+            </Typography>
+          )}
+        </Stack>
       )}
     </Stack>
   );

@@ -80,7 +80,10 @@ export default function Roulette() {
     if (mode === 'dice') {
       const value = randomInt(settings.sides) + 1;
       await dice.current?.run(value, seconds);
-      const option = active.length ? active[diceOption(value, active.length)].label : null;
+      const option =
+        settings.diceOptions && active.length
+          ? active[diceOption(value, active.length)].label
+          : null;
       return { lines: [option ? `${value} → ${option}` : `${value}`], color: NUMBER_COLOR };
     }
     if (mode === 'raffle') {
@@ -144,8 +147,10 @@ export default function Roulette() {
             key={settings.sides}
             ref={dice}
             sides={settings.sides}
-            hasOptions={active.length > 0}
+            options={active}
+            useOptions={settings.diceOptions}
             onSides={(sides) => update({ sides })}
+            onUseOptions={(diceOptions) => update({ diceOptions })}
           />
         )}
         {mode === 'cards' && <Cards key={activeKey} ref={cards} options={active} />}
@@ -214,7 +219,7 @@ export default function Roulette() {
             labels={settings.coinLabels}
             onLabels={(labels) => update({ coinLabels: labels })}
           />
-        ) : (
+        ) : mode === 'dice' && !settings.diceOptions ? null : (
           <OptionsPanel
             options={options}
             presets={presets}
