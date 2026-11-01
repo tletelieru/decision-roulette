@@ -38,6 +38,14 @@ export function createAppTheme(mode: ColorMode): Theme {
       button: { textTransform: 'none', fontWeight: 600 },
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          '*': {
+            scrollbarWidth: 'thin',
+            scrollbarColor: `${dark ? 'rgba(255,255,255,0.22)' : 'rgba(23,24,28,0.22)'} transparent`,
+          },
+        },
+      },
       MuiButton: {
         defaultProps: { disableElevation: true },
         styleOverrides: { root: { borderRadius: 10, paddingInline: 18 } },

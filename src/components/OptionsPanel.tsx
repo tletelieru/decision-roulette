@@ -110,7 +110,7 @@ export default function OptionsPanel({
           />
         </Stack>
 
-        <Stack spacing={0.5} sx={{ maxHeight: 320, overflowY: 'auto' }}>
+        <Stack spacing={0.5} sx={{ maxHeight: 320, overflowY: 'auto', pr: 0.5 }}>
           {options.map((option, index) => (
             <Stack
               key={option.id}
