@@ -11,6 +11,8 @@ import { COIN_COLORS, readableText, sliceColor } from '../lib/palette';
 import { pickMany, pickWeightedIndex, randomInt } from '../lib/random';
 import { defaultSettings, isSettings, restoreSettings } from '../lib/settings';
 import type { Settings } from '../lib/settings';
+import { decodeShare, encodeShare } from '../lib/share';
+import type { SharedState } from '../lib/share';
 import { load, save } from '../lib/storage';
 import Cards from './Cards';
 import Coin from './Coin';
@@ -43,23 +45,38 @@ export default function Roulette() {
   const t = useMessages(messages);
   const starter = (index: number) =>
     t.options.starters[index].items.map((label) => createOption(label));
+  const [shared] = useState(() => decodeShare(window.location.hash));
+  const [sharedList] = useState(
+    () => shared?.options?.map((option) => createOption(option.label, option.weight)) ?? null,
+  );
+  const initialList = (listMode: Mode, key: string, starterIndex: number) =>
+    shared?.mode === listMode && sharedList
+      ? sharedList
+      : load(key, isOptionList, starter(starterIndex));
   const [options, setOptions] = useState<Option[]>(() =>
-    load(OPTIONS_KEY, isOptionList, starter(WHEEL_STARTER)),
+    initialList('wheel', OPTIONS_KEY, WHEEL_STARTER),
   );
-  const [deck, setDeck] = useState<Option[]>(() =>
-    load(CARDS_KEY, isOptionList, starter(CARDS_STARTER)),
-  );
+  const [deck, setDeck] = useState<Option[]>(() => initialList('cards', CARDS_KEY, CARDS_STARTER));
   const [names, setNames] = useState<Option[]>(() =>
-    load(RAFFLE_KEY, isOptionList, starter(RAFFLE_STARTER)),
+    initialList('raffle', RAFFLE_KEY, RAFFLE_STARTER),
   );
   const [answers, setAnswers] = useState<Option[]>(() =>
-    load(ORACLE_KEY, isOptionList, starter(ORACLE_STARTER)),
+    initialList('oracle', ORACLE_KEY, ORACLE_STARTER),
   );
-  const [question, setQuestion] = useState('');
+  const [question, setQuestion] = useState(shared?.question ?? '');
+  const [copied, setCopied] = useState(false);
   const [presets, setPresets] = useState<Preset[]>(() => load(PRESETS_KEY, isPresetList, []));
-  const [settings, setSettings] = useState<Settings>(() =>
-    restoreSettings(load(SETTINGS_KEY, isSettings, defaultSettings)),
-  );
+  const [settings, setSettings] = useState<Settings>(() => {
+    const restored = restoreSettings(load(SETTINGS_KEY, isSettings, defaultSettings));
+    if (!shared) return restored;
+    return {
+      ...restored,
+      mode: shared.mode,
+      sides: shared.sides ?? restored.sides,
+      winners: shared.winners ?? restored.winners,
+      coinLabels: shared.coin ?? restored.coinLabels,
+    };
+  });
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [stopping, setStopping] = useState(false);
@@ -84,10 +101,18 @@ export default function Roulette() {
   const stopLabel = running && settings.stopButton;
   const winners = Math.min(Math.max(1, settings.winners), Math.max(1, active.length));
 
-  useEffect(() => save(OPTIONS_KEY, options), [options]);
-  useEffect(() => save(RAFFLE_KEY, names), [names]);
-  useEffect(() => save(CARDS_KEY, deck), [deck]);
-  useEffect(() => save(ORACLE_KEY, answers), [answers]);
+  useEffect(() => {
+    if (options !== sharedList) save(OPTIONS_KEY, options);
+  }, [options, sharedList]);
+  useEffect(() => {
+    if (names !== sharedList) save(RAFFLE_KEY, names);
+  }, [names, sharedList]);
+  useEffect(() => {
+    if (deck !== sharedList) save(CARDS_KEY, deck);
+  }, [deck, sharedList]);
+  useEffect(() => {
+    if (answers !== sharedList) save(ORACLE_KEY, answers);
+  }, [answers, sharedList]);
   useEffect(() => save(PRESETS_KEY, presets), [presets]);
   useEffect(() => save(SETTINGS_KEY, settings), [settings]);
 
@@ -95,6 +120,45 @@ export default function Roulette() {
     settings.coinLabels[0].trim() || t.coin.yes,
     settings.coinLabels[1].trim() || t.coin.no,
   ];
+
+  const shareHash = useMemo(() => {
+    const state: SharedState = { mode };
+    if (mode === 'coin') state.coin = settings.coinLabels;
+    else if (mode === 'dice') state.sides = settings.sides;
+    else {
+      state.options = active.map(({ label, weight }) => ({ label: label.trim(), weight }));
+      if (mode === 'raffle') state.winners = winners;
+      if (mode === 'oracle') state.question = question.trim();
+    }
+    return encodeShare(state);
+  }, [active, mode, question, settings.coinLabels, settings.sides, winners]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => history.replaceState(null, '', `#${shareHash}`), 250);
+    return () => clearTimeout(timer);
+  }, [shareHash]);
+
+  useEffect(() => {
+    const reload = () => location.reload();
+    window.addEventListener('hashchange', reload);
+    return () => window.removeEventListener('hashchange', reload);
+  }, []);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 1800);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  const copyLink = async () => {
+    const { origin, pathname } = window.location;
+    try {
+      await navigator.clipboard.writeText(`${origin}${pathname}#${shareHash}`);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   const update = (patch: Partial<Settings>) => setSettings({ ...settings, ...patch });
 
@@ -260,6 +324,9 @@ export default function Roulette() {
           }}
         >
           {stopLabel ? t.roulette.stop : t.roulette.action[mode]}
+        </Button>
+        <Button size="small" onClick={() => void copyLink()}>
+          {copied ? t.roulette.copied : t.roulette.copyLink}
         </Button>
       </Stack>
 

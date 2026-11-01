@@ -1,9 +1,10 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import App from './App';
 
 beforeEach(() => {
   localStorage.clear();
+  history.replaceState(null, '', '/');
   localStorage.setItem('preferred-lang', 'en');
   localStorage.setItem('color-mode', 'light');
 });
@@ -209,6 +210,25 @@ describe('App', () => {
     expect(await screen.findByText('The result is')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Wheel' }));
     expect(screen.queryByRole('button', { name: 'Remove Probably' })).toBeNull();
+  });
+
+  it('opens a shared link on its mode and list without touching saved data', () => {
+    localStorage.setItem(
+      'dr-raffle',
+      JSON.stringify([{ id: 'a', label: 'Mine', weight: 1 }]),
+    );
+    history.replaceState(null, '', '/#mode=raffle&o=Luz&o=Mar&n=2');
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Remove Luz' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Remove Mine' })).toBeNull();
+    expect(screen.getByText('2')).toBeTruthy();
+    expect(localStorage.getItem('dr-raffle')).toContain('Mine');
+  });
+
+  it('keeps the url in sync with the current mode', async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Dice' }));
+    await waitFor(() => expect(location.hash).toBe('#mode=dice&d=6'));
   });
 
   it('limits raffle winners to the option count', () => {

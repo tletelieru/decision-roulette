@@ -15,6 +15,8 @@ type Strings = {
   roulette: {
     spin: string;
     stop: string;
+    copyLink: string;
+    copied: string;
     action: Record<Mode, string>;
     spinning: string;
     winner: string;
@@ -82,6 +84,8 @@ export const messages = defineMessages<Strings>({
     roulette: {
       spin: 'SPIN',
       stop: 'Stop',
+      copyLink: 'Copy link',
+      copied: 'Link copied',
       action: {
         wheel: 'Spin the wheel',
         coin: 'Flip the coin',
@@ -171,6 +175,8 @@ export const messages = defineMessages<Strings>({
     roulette: {
       spin: 'GIRAR',
       stop: 'Detener',
+      copyLink: 'Copiar enlace',
+      copied: 'Enlace copiado',
       action: {
         wheel: 'Girar la ruleta',
         coin: 'Lanzar la moneda',
