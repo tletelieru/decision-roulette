@@ -282,6 +282,7 @@ export default function Roulette() {
             ref={dice}
             sides={settings.sides}
             draggable={canRun}
+            disabled={running}
             onSides={(sides) => update({ sides })}
             onFling={() => void run()}
           />

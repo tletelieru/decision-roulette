@@ -114,6 +114,19 @@ describe('App', () => {
     expect(screen.getByText(/^(1|2|3|4|5|6)$/)).toBeTruthy();
   });
 
+  it('locks the dice sides while rolling', () => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({ duration: 5, instant: false, sound: false, confetti: false }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Dice' }));
+    const sides = screen.getByRole('button', { name: 'd20' }) as HTMLButtonElement;
+    expect(sides.disabled).toBe(false);
+    fireEvent.click(screen.getByRole('button', { name: 'Roll the dice' }));
+    expect(sides.disabled).toBe(true);
+  });
+
   it('loads a quick list', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Food' }));
