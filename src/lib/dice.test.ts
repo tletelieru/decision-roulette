@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { diceSides } from './modes';
-import { dot, facingRotation, normalize, planRoll, restingRotation, rollAt, rotate, solidFor } from './dice';
-import type { Quat } from './dice';
+import {
+  CAMERA_DEPTH,
+  dot,
+  facesCamera,
+  facingRotation,
+  normalize,
+  planRoll,
+  restingRotation,
+  rollAt,
+  rotate,
+  solidFor,
+} from './dice';
+import type { Quat, Vec } from './dice';
 
 describe.each(diceSides)('d%i', (sides) => {
   const solid = solidFor(sides);
@@ -28,6 +39,25 @@ describe.each(diceSides)('d%i', (sides) => {
         rotate(rotation, item.normal)[2] > rotate(rotation, top.normal)[2] ? item : top,
       );
       expect(best.value).toBe(face.value);
+    }
+  });
+
+  it('draws exactly the faces that face the camera through perspective', () => {
+    const project = ([x, y, z]: Vec) => {
+      const lens = 1 / (1 - z * CAMERA_DEPTH);
+      return [x * lens, y * lens];
+    };
+    for (const face of solid.faces) {
+      const rotation = restingRotation(solid, face.value);
+      for (const item of solid.faces) {
+        const points = item.points.map((index) => project(rotate(rotation, solid.vertices[index])));
+        const area = points.reduce((sum, [x, y], index) => {
+          const [nextX, nextY] = points[(index + 1) % points.length];
+          return sum + x * nextY - nextX * y;
+        }, 0);
+        const visible = facesCamera(rotate(rotation, item.normal), rotate(rotation, item.center));
+        if (Math.abs(area) > 1e-9) expect(visible).toBe(area > 0);
+      }
     }
   });
 

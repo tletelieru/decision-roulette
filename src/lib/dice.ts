@@ -7,6 +7,7 @@ export type Solid = { vertices: Vec[]; faces: Face[] };
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 const REST_TILT = { x: 0.3, y: -0.24 };
+const REST_AMOUNT: Record<number, number> = { 4: 2.1, 20: 0.6 };
 const STRIDE: Record<number, number> = { 4: 1, 6: 5, 8: 3, 12: 5, 20: 7 };
 
 const add = (a: Vec, b: Vec): Vec => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -170,12 +171,18 @@ export function facingRotation(face: Face): Quat {
 
 export function restingRotation(solid: Solid, value: number): Quat {
   const face = solid.faces.find((item) => item.value === value) ?? solid.faces[0];
-  const amount = solid.faces.length === 20 ? 0.6 : 1;
+  const amount = REST_AMOUNT[solid.faces.length] ?? 1;
   const tilt = multiply(
     axisAngle([1, 0, 0], REST_TILT.x * amount),
     axisAngle([0, 1, 0], REST_TILT.y * amount),
   );
   return multiply(tilt, facingRotation(face));
+}
+
+export const CAMERA_DEPTH = 0.16;
+
+export function facesCamera(normal: Vec, center: Vec): boolean {
+  return dot(normal, sub([0, 0, 1 / CAMERA_DEPTH], center)) > 1e-6;
 }
 
 export type Roll = { end: Quat; axis: Vec; angle: number; wobble: Vec; wobbleTurns: number };

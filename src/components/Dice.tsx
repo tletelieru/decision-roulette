@@ -5,7 +5,9 @@ import { messages } from '../i18n/messages';
 import { useMessages } from '../i18n/react';
 import {
   axisAngle,
+  CAMERA_DEPTH,
   dot,
+  facesCamera,
   multiply,
   normalize,
   planRoll,
@@ -30,7 +32,6 @@ const DRAG_SPEED = 0.012;
 const MIN_DRAG_PX = 24;
 
 const LIGHT = normalize([-0.45, 0.6, 0.75]);
-const DEPTH = 0.16;
 const FONT_SCALE: Record<number, number> = { 4: 0.42, 6: 0.62, 8: 0.4, 12: 0.34, 20: 0.23 };
 
 function shade(hex: string, light: number): string {
@@ -70,13 +71,18 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
     const center = size / 2;
     const q = orientation.current;
     const project = (point: Vec): [number, number] => {
-      const lens = 1 / (1 - point[2] * DEPTH);
+      const lens = 1 / (1 - point[2] * CAMERA_DEPTH);
       return [center + point[0] * radius * lens, center - point[1] * radius * lens];
     };
     const corners = solid.vertices.map((vertex) => rotate(q, vertex));
     const visible = solid.faces
-      .map((face) => ({ face, normal: rotate(q, face.normal) }))
-      .filter(({ normal }) => normal[2] > 0.02);
+      .map((face) => ({
+        face,
+        normal: rotate(q, face.normal),
+        mid: rotate(q, face.center),
+      }))
+      .filter(({ normal, mid }) => facesCamera(normal, mid))
+      .sort((a, b) => a.mid[2] - b.mid[2]);
     const outline = (points: number[]) => {
       ctx.beginPath();
       points
@@ -109,8 +115,7 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
     ctx.font = `800 ${FONT_SCALE[sides] * 100}px Inter, ui-sans-serif, system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    for (const { face, normal } of visible) {
-      const mid = rotate(q, face.center);
+    for (const { face, normal, mid } of visible) {
       const up = rotate(q, face.up);
       const right: Vec = [
         up[1] * normal[2] - up[2] * normal[1],
@@ -118,7 +123,7 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
         up[0] * normal[1] - up[1] * normal[0],
       ];
       const [x, y] = project(mid);
-      const unit = (radius / (1 - mid[2] * DEPTH)) * 0.01;
+      const unit = (radius / (1 - mid[2] * CAMERA_DEPTH)) * 0.01;
       ctx.setTransform(
         ratio * right[0] * unit,
         -ratio * right[1] * unit,
@@ -128,7 +133,8 @@ export default function Dice({ ref, sides, draggable, onSides, onFling }: Props)
         ratio * y,
       );
       const muted = rolled !== null && face.value !== rolled;
-      ctx.fillStyle = muted ? (dark ? '#c9cad1' : '#4a4c56') : ink;
+      if (muted) ctx.fillStyle = dark ? 'rgba(255,255,255,0.45)' : 'rgba(23,24,28,0.4)';
+      else ctx.fillStyle = ink;
       const marked = sides > 6 && (face.value === 6 || face.value === 9);
       ctx.fillText(marked ? `${face.value}.` : `${face.value}`, 0, 2);
     }
