@@ -49,7 +49,7 @@ type Strings = {
     sound: string;
     confetti: string;
   };
-  footer: { developedBy: string };
+  footer: { developedBy: string; rights: string };
 };
 
 export const messages = defineMessages<Strings>({
@@ -306,7 +306,7 @@ export const messages = defineMessages<Strings>({
       sound: 'Sound',
       confetti: 'Confetti',
     },
-    footer: { developedBy: 'Developed by' },
+    footer: { developedBy: 'Developed by', rights: 'All rights reserved.' },
   },
   es: {
     appName: 'Decision Maker',
@@ -561,6 +561,6 @@ export const messages = defineMessages<Strings>({
       sound: 'Sonido',
       confetti: 'Confeti',
     },
-    footer: { developedBy: 'Desarrollado por' },
+    footer: { developedBy: 'Desarrollado por', rights: 'Todos los derechos reservados.' },
   },
 });

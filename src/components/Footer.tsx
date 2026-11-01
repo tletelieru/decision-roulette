@@ -10,29 +10,29 @@ export default function Footer() {
   const t = useMessages(messages).footer;
 
   return (
-    <Stack
-      component="footer"
-      direction="row"
-      spacing={0.5}
-      sx={{ alignItems: 'center', justifyContent: 'center', pt: 2 }}
-    >
-      <Typography variant="body2" color="text.secondary">
-        {t.developedBy}{' '}
-        <Link href={SITE_URL} target="_blank" rel="noreferrer">
-          tletelieru
-        </Link>
+    <Stack component="footer" spacing={0.25} sx={{ alignItems: 'center', pt: 2 }}>
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          {t.developedBy}{' '}
+          <Link href={SITE_URL} target="_blank" rel="noreferrer">
+            tletelieru
+          </Link>
+        </Typography>
+        <Tooltip title="GitHub">
+          <IconButton
+            size="small"
+            aria-label="GitHub"
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <GitHubIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+      <Typography variant="caption" color="text.secondary">
+        © 2026 tletelieru. {t.rights}
       </Typography>
-      <Tooltip title="GitHub">
-        <IconButton
-          size="small"
-          aria-label="GitHub"
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <GitHubIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
     </Stack>
   );
 }

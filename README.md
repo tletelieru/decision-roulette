@@ -1,6 +1,8 @@
 # Decision Maker
 
-Make random decisions with a wheel, slot machine, cards, coins, dice, elimination rounds, brackets and raffles. Runs entirely in the browser and works offline as a PWA.
+Make random decisions with a wheel, a coin, 3D dice, a shuffled deck, raffles and an oracle. Runs entirely in the browser and works offline as a PWA.
+
+Lists can be saved, shared by link, and results can be shared or downloaded as an image, in English and Spanish, with light and dark themes.
 
 ## Development
 

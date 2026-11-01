@@ -18,7 +18,7 @@ export default defineConfig({
       manifest: {
         name: 'Decision Maker',
         short_name: 'Decisions',
-        description: 'Make random decisions with a wheel, slots, cards, coins and dice.',
+        description: 'Make random decisions with a wheel, coin, dice, cards, raffle and oracle.',
         theme_color: '#17181c',
         background_color: '#17181c',
         display: 'standalone',
