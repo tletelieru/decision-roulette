@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pickWeightedIndex, secureRandom } from './random';
+import { pickMany, pickWeightedIndex, randomInt, secureRandom } from './random';
 
 describe('pickWeightedIndex', () => {
   it('maps the roll onto the weight ranges', () => {
@@ -24,6 +24,26 @@ describe('pickWeightedIndex', () => {
     for (let i = 0; i < 20000; i += 1) counts[pickWeightedIndex([1, 3])] += 1;
     expect(counts[1] / 20000).toBeGreaterThan(0.72);
     expect(counts[1] / 20000).toBeLessThan(0.78);
+  });
+});
+
+describe('pickMany', () => {
+  it('picks without repeats', () => {
+    for (let i = 0; i < 200; i += 1) {
+      const picks = pickMany([1, 1, 1, 1, 1], 3);
+      expect(new Set(picks).size).toBe(3);
+    }
+  });
+
+  it('stops when the pool runs out', () => {
+    expect(pickMany([1, 0, 1], 5).sort()).toEqual([0, 2]);
+  });
+});
+
+describe('randomInt', () => {
+  it('stays below the maximum', () => {
+    expect(randomInt(6, () => 0)).toBe(0);
+    expect(randomInt(6, () => 0.999)).toBe(5);
   });
 });
 

@@ -1,3 +1,4 @@
+import type { Mode } from '../lib/modes';
 import { defineMessages } from './react';
 
 type Strings = {
@@ -5,10 +6,14 @@ type Strings = {
   toLight: string;
   toDark: string;
   language: string;
-  hero: { title: string; subtitle: string };
+  hero: { title: string; subtitle: Record<Mode, string> };
+  modes: Record<Mode, string> & { label: string };
+  coin: { yes: string; no: string };
+  dice: { sides: string; mapped: string };
+  raffle: { count: string };
   roulette: {
     spin: string;
-    spinAgain: string;
+    action: Record<Mode, string>;
     spinning: string;
     winner: string;
     needTwo: string;
@@ -48,13 +53,36 @@ export const messages = defineMessages<Strings>({
     language: 'Language',
     hero: {
       title: 'Let chance decide',
-      subtitle: 'Add your options and spin.',
+      subtitle: {
+        wheel: 'Add your options and spin.',
+        coin: 'A quick yes or no.',
+        dice: 'Roll a die, with or without options.',
+        cards: 'Shuffle the deck and reveal one card.',
+        raffle: 'Draw winners without repeats.',
+      },
     },
+    modes: {
+      label: 'Picker mode',
+      wheel: 'Wheel',
+      coin: 'Coin',
+      dice: 'Dice',
+      cards: 'Cards',
+      raffle: 'Raffle',
+    },
+    coin: { yes: 'Yes', no: 'No' },
+    dice: { sides: 'Die type', mapped: 'Each number maps to your options, in order.' },
+    raffle: { count: 'Winners' },
     roulette: {
       spin: 'SPIN',
-      spinAgain: 'Spin the wheel',
+      action: {
+        wheel: 'Spin the wheel',
+        coin: 'Flip the coin',
+        dice: 'Roll the die',
+        cards: 'Shuffle and draw',
+        raffle: 'Draw winners',
+      },
       spinning: 'Spinning…',
-      winner: 'The wheel says',
+      winner: 'The result is',
       needTwo: 'Add at least two options to spin.',
       defaults: ['Pizza', 'Sushi', 'Tacos', 'Burgers', 'Salad', 'Pasta'],
     },
@@ -90,13 +118,36 @@ export const messages = defineMessages<Strings>({
     language: 'Idioma',
     hero: {
       title: 'Deja que el azar decida',
-      subtitle: 'Agrega tus opciones y gira.',
+      subtitle: {
+        wheel: 'Agrega tus opciones y gira.',
+        coin: 'Un sí o no rápido.',
+        dice: 'Lanza un dado, con o sin opciones.',
+        cards: 'Baraja el mazo y revela una carta.',
+        raffle: 'Sortea ganadores sin repetir.',
+      },
     },
+    modes: {
+      label: 'Modo de selección',
+      wheel: 'Ruleta',
+      coin: 'Moneda',
+      dice: 'Dados',
+      cards: 'Cartas',
+      raffle: 'Sorteo',
+    },
+    coin: { yes: 'Sí', no: 'No' },
+    dice: { sides: 'Tipo de dado', mapped: 'Cada número corresponde a tus opciones, en orden.' },
+    raffle: { count: 'Ganadores' },
     roulette: {
       spin: 'GIRAR',
-      spinAgain: 'Girar la ruleta',
+      action: {
+        wheel: 'Girar la ruleta',
+        coin: 'Lanzar la moneda',
+        dice: 'Lanzar el dado',
+        cards: 'Barajar y sacar',
+        raffle: 'Sortear ganadores',
+      },
       spinning: 'Girando…',
-      winner: 'La ruleta dice',
+      winner: 'El resultado es',
       needTwo: 'Agrega al menos dos opciones para girar.',
       defaults: ['Pizza', 'Sushi', 'Tacos', 'Hamburguesas', 'Ensalada', 'Pasta'],
     },

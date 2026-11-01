@@ -43,7 +43,29 @@ describe('App', () => {
     );
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Spin the wheel' }));
-    expect(await screen.findByText('The wheel says')).toBeTruthy();
+    expect(await screen.findByText('The result is')).toBeTruthy();
+  });
+
+  it.each([
+    ['Coin', 'Flip the coin'],
+    ['Dice', 'Roll the die'],
+    ['Cards', 'Shuffle and draw'],
+    ['Raffle', 'Draw winners'],
+  ])('runs the %s mode', async (mode, action) => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 5,
+        instant: true,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: mode }));
+    fireEvent.click(screen.getByRole('button', { name: action }));
+    expect(await screen.findByText('The result is')).toBeTruthy();
   });
 
   it('adds options and blocks spinning with fewer than two', () => {
