@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { messages } from '../i18n/messages';
 import { useMessages } from '../i18n/react';
 import { burstConfetti, playWin, prefersReducedMotion, vibrate } from '../lib/feedback';
-import { diceOption, needsOptions } from '../lib/modes';
+import { needsOptions } from '../lib/modes';
 import type { Mode, Stage } from '../lib/modes';
 import { activeOptions, createOption, isOptionList, isPresetList } from '../lib/options';
 import type { Option, Preset } from '../lib/options';
@@ -80,11 +80,7 @@ export default function Roulette() {
     if (mode === 'dice') {
       const value = randomInt(settings.sides) + 1;
       await dice.current?.run(value, seconds);
-      const option =
-        settings.diceOptions && active.length
-          ? active[diceOption(value, active.length)].label
-          : null;
-      return { lines: [option ? `${value} → ${option}` : `${value}`], color: NUMBER_COLOR };
+      return { lines: [`${value}`], color: NUMBER_COLOR };
     }
     if (mode === 'raffle') {
       const picks = pickMany(weights, winners);
@@ -147,10 +143,7 @@ export default function Roulette() {
             key={settings.sides}
             ref={dice}
             sides={settings.sides}
-            options={active}
-            useOptions={settings.diceOptions}
             onSides={(sides) => update({ sides })}
-            onUseOptions={(diceOptions) => update({ diceOptions })}
           />
         )}
         {mode === 'cards' && <Cards key={activeKey} ref={cards} options={active} />}
@@ -219,7 +212,7 @@ export default function Roulette() {
             labels={settings.coinLabels}
             onLabels={(labels) => update({ coinLabels: labels })}
           />
-        ) : mode === 'dice' && !settings.diceOptions ? null : (
+        ) : mode === 'dice' ? null : (
           <OptionsPanel
             options={options}
             presets={presets}

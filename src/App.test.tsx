@@ -94,7 +94,7 @@ describe('App', () => {
     expect(screen.getAllByText('Heads').length).toBeGreaterThanOrEqual(3);
   });
 
-  it('rolls plain numbers until options are switched on', () => {
+  it('rolls plain numbers without the option list', async () => {
     localStorage.setItem(
       'dr-settings',
       JSON.stringify({
@@ -108,9 +108,9 @@ describe('App', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Dice' }));
     expect(screen.queryByRole('button', { name: 'Remove Movie' })).toBeNull();
-    fireEvent.click(screen.getByRole('switch', { name: 'Use my options' }));
-    expect(screen.getByText('1 → Movie')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Remove Movie' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll the dice' }));
+    await screen.findByText('The result is');
+    expect(screen.getByText(/^(1|2|3|4|5|6)$/)).toBeTruthy();
   });
 
   it('loads a quick list', () => {

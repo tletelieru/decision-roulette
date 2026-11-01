@@ -1,31 +1,17 @@
-import {
-  Box,
-  Chip,
-  FormControlLabel,
-  Stack,
-  Switch,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Box, Stack, ToggleButton, ToggleButtonGroup, useTheme } from '@mui/material';
 import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { Ref } from 'react';
 import { messages } from '../i18n/messages';
 import { useMessages } from '../i18n/react';
 import { dot, normalize, planRoll, restingRotation, rollAt, rotate, solidFor } from '../lib/dice';
 import type { Quat, Vec } from '../lib/dice';
-import { diceNumbers, diceSides } from '../lib/modes';
+import { diceSides } from '../lib/modes';
 import type { Stage } from '../lib/modes';
-import type { Option } from '../lib/options';
 
 type Props = {
   ref: Ref<Stage<number>>;
   sides: number;
-  options: Option[];
-  useOptions: boolean;
   onSides: (sides: number) => void;
-  onUseOptions: (use: boolean) => void;
 };
 
 const LIGHT = normalize([-0.45, 0.6, 0.75]);
@@ -38,7 +24,7 @@ function shade(hex: string, light: number): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-export default function Dice({ ref, sides, options, useOptions, onSides, onUseOptions }: Props) {
+export default function Dice({ ref, sides, onSides }: Props) {
   const t = useMessages(messages).dice;
   const theme = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -187,8 +173,6 @@ export default function Dice({ ref, sides, options, useOptions, onSides, onUseOp
     [draw, sides],
   );
 
-  const reached = options.slice(0, sides);
-
   return (
     <Stack spacing={1.5} sx={{ alignItems: 'center', width: '100%' }}>
       <ToggleButtonGroup
@@ -218,45 +202,6 @@ export default function Dice({ ref, sides, options, useOptions, onSides, onUseOp
           filter: 'drop-shadow(0 14px 16px rgba(0,0,0,0.3))',
         }}
       />
-      <FormControlLabel
-        control={
-          <Switch
-            size="small"
-            checked={useOptions}
-            onChange={(event) => onUseOptions(event.target.checked)}
-          />
-        }
-        label={<Typography variant="body2">{t.useOptions}</Typography>}
-      />
-      {useOptions && options.length > 0 && (
-        <Stack spacing={1} sx={{ alignItems: 'center', width: '100%' }}>
-          <Stack
-            direction="row"
-            useFlexGap
-            spacing={0.75}
-            sx={{ flexWrap: 'wrap', justifyContent: 'center' }}
-          >
-            {reached.map((option, index) => {
-              const numbers = diceNumbers(index, options.length, sides);
-              const won = rolled !== null && numbers.includes(rolled);
-              return (
-                <Chip
-                  key={option.id}
-                  size="small"
-                  label={`${numbers.join(', ')} → ${option.label}`}
-                  color={won ? 'primary' : 'default'}
-                  variant={won ? 'filled' : 'outlined'}
-                />
-              );
-            })}
-          </Stack>
-          {options.length > sides && (
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-              {t.tooMany.replace('{count}', String(sides))}
-            </Typography>
-          )}
-        </Stack>
-      )}
     </Stack>
   );
 }

@@ -10,7 +10,6 @@ export type Settings = {
   mode: Mode;
   sides: number;
   winners: number;
-  diceOptions: boolean;
   coinLabels: [string, string];
 };
 
@@ -23,7 +22,6 @@ export const defaultSettings: Settings = {
   mode: 'wheel',
   sides: 6,
   winners: 1,
-  diceOptions: false,
   coinLabels: ['', ''],
 };
 

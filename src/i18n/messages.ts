@@ -9,7 +9,7 @@ type Strings = {
   hero: { title: string; subtitle: Record<Mode, string> };
   modes: Record<Mode, string> & { label: string };
   coin: { yes: string; no: string };
-  dice: { sides: string; useOptions: string; tooMany: string };
+  dice: { sides: string };
   raffle: { count: string };
   roulette: {
     spin: string;
@@ -71,11 +71,7 @@ export const messages = defineMessages<Strings>({
       raffle: 'Raffle',
     },
     coin: { yes: 'Yes', no: 'No' },
-    dice: {
-      sides: 'Dice type',
-      useOptions: 'Use my options',
-      tooMany: 'Only the first {count} options can be rolled.',
-    },
+    dice: { sides: 'Dice type' },
     raffle: { count: 'Winners' },
     roulette: {
       spin: 'SPIN',
@@ -152,11 +148,7 @@ export const messages = defineMessages<Strings>({
       raffle: 'Sorteo',
     },
     coin: { yes: 'Sí', no: 'No' },
-    dice: {
-      sides: 'Tipo de dado',
-      useOptions: 'Usar mis opciones',
-      tooMany: 'Este dado solo alcanza las primeras {count} opciones.',
-    },
+    dice: { sides: 'Tipo de dado' },
     raffle: { count: 'Ganadores' },
     roulette: {
       spin: 'GIRAR',
