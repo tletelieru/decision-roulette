@@ -257,6 +257,29 @@ describe('App', () => {
     expect(await screen.findByText('The result is')).toBeTruthy();
   });
 
+  it('offers share and image actions only after a result', async () => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 5,
+        instant: true,
+        sound: false,
+        confetti: false,
+        showWeights: false,
+      }),
+    );
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Coin' }));
+    expect(screen.queryByRole('button', { name: 'Download image' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Flip the coin' }));
+    expect(await screen.findByRole('button', { name: 'Download image' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Share result' })).toBeTruthy();
+    const confetti = screen.getByRole('switch', { name: 'With confetti' }) as HTMLInputElement;
+    expect(confetti.checked).toBe(true);
+    fireEvent.click(confetti);
+    expect(confetti.checked).toBe(false);
+  });
+
   it('limits raffle winners to the option count', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Raffle' }));

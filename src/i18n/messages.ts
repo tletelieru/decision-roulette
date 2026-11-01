@@ -12,6 +12,7 @@ type Strings = {
   dice: { sides: string };
   raffle: { count: string; more: string; fewer: string };
   oracle: { placeholder: string; needQuestion: string };
+  result: { share: string; download: string; withConfetti: string; copied: string };
   roulette: {
     spin: string;
     stop: string;
@@ -81,6 +82,12 @@ export const messages = defineMessages<Strings>({
     dice: { sides: 'Dice type' },
     raffle: { count: 'Winners', more: 'More winners', fewer: 'Fewer winners' },
     oracle: { placeholder: 'Write your question', needQuestion: 'Write a question first.' },
+    result: {
+      share: 'Share result',
+      download: 'Download image',
+      withConfetti: 'With confetti',
+      copied: 'Result copied',
+    },
     roulette: {
       spin: 'SPIN',
       stop: 'Stop',
@@ -330,6 +337,12 @@ export const messages = defineMessages<Strings>({
     dice: { sides: 'Tipo de dado' },
     raffle: { count: 'Ganadores', more: 'Más ganadores', fewer: 'Menos ganadores' },
     oracle: { placeholder: 'Escribe tu pregunta', needQuestion: 'Escribe una pregunta primero.' },
+    result: {
+      share: 'Compartir resultado',
+      download: 'Descargar imagen',
+      withConfetti: 'Con confeti',
+      copied: 'Resultado copiado',
+    },
     roulette: {
       spin: 'GIRAR',
       stop: 'Detener',

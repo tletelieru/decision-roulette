@@ -22,6 +22,7 @@ import ModeTabs from './ModeTabs';
 import Oracle from './Oracle';
 import OptionsPanel from './OptionsPanel';
 import Raffle from './Raffle';
+import ResultActions from './ResultActions';
 import SettingsPanel from './SettingsPanel';
 import Wheel from './Wheel';
 import type { WheelHandle } from './Wheel';
@@ -315,6 +316,20 @@ export default function Roulette() {
             )
           )}
         </Box>
+
+        {result && (
+          <ResultActions
+            card={{
+              appName: t.appName,
+              mode: t.modes[mode],
+              winner: t.roulette.winner,
+              lines: result.lines,
+              color: result.color,
+              question: mode === 'oracle' ? question.trim() : undefined,
+            }}
+            link={`${window.location.origin}${window.location.pathname}#${shareHash}`}
+          />
+        )}
 
         <Button
           variant="contained"
