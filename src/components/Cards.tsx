@@ -11,7 +11,7 @@ type Props = { ref: Ref<Stage<number>>; options: Option[] };
 type Reveal = { position: number; label: string };
 
 const FLIP_MS = 380;
-const MAX_SHUFFLE_MS = 1200;
+const ROUND_MS = 650;
 
 const FACE = {
   position: 'absolute',
@@ -43,22 +43,25 @@ export default function Cards({ ref, options }: Props) {
       setReveal(null);
       const element = fan.current;
       if (seconds > 0 && element) {
-        const shuffle = Math.min(seconds * 300, MAX_SHUFFLE_MS);
+        const shuffle = Math.max(ROUND_MS, seconds * 1000 - FLIP_MS);
+        const rounds = Math.max(1, Math.round(shuffle / ROUND_MS));
         const bounds = element.getBoundingClientRect();
-        for (const card of Array.from(element.children)) {
-          const rect = card.getBoundingClientRect();
-          const dx = bounds.left + bounds.width / 2 - rect.left - rect.width / 2;
-          card.firstElementChild?.animate?.(
-            [
-              { transform: 'none' },
-              { transform: `translateX(${dx}px) rotate(${randomInt(30) - 15}deg)`, offset: 0.4 },
-              { transform: `translateX(${dx}px) rotate(${randomInt(30) - 15}deg)`, offset: 0.6 },
-              { transform: 'none' },
-            ],
-            { duration: shuffle, easing: 'ease-in-out' },
-          );
+        for (let round = 0; round < rounds; round += 1) {
+          for (const card of Array.from(element.children)) {
+            const rect = card.getBoundingClientRect();
+            const dx = bounds.left + bounds.width / 2 - rect.left - rect.width / 2;
+            card.firstElementChild?.animate?.(
+              [
+                { transform: 'none' },
+                { transform: `translateX(${dx}px) rotate(${randomInt(30) - 15}deg)`, offset: 0.4 },
+                { transform: `translateX(${dx}px) rotate(${randomInt(30) - 15}deg)`, offset: 0.6 },
+                { transform: 'none' },
+              ],
+              { duration: shuffle / rounds, easing: 'ease-in-out' },
+            );
+          }
+          await wait(shuffle / rounds);
         }
-        await wait(shuffle);
       }
       setReveal({ position: randomInt(options.length), label: options[index].label });
       if (seconds > 0) await wait(FLIP_MS);
