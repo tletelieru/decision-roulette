@@ -127,6 +127,26 @@ describe('App', () => {
     expect(sides.disabled).toBe(true);
   });
 
+  it('lets a weight be cleared while typing', () => {
+    localStorage.setItem(
+      'dr-settings',
+      JSON.stringify({
+        duration: 5,
+        instant: true,
+        sound: false,
+        confetti: false,
+        showWeights: true,
+      }),
+    );
+    render(<App />);
+    const input = screen.getAllByRole('spinbutton')[0] as HTMLInputElement;
+    const value = input.value;
+    fireEvent.change(input, { target: { value: '' } });
+    expect(input.value).toBe('');
+    fireEvent.blur(input);
+    expect(input.value).toBe(value);
+  });
+
   it('loads a quick list', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Food' }));
