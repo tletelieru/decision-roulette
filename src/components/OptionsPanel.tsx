@@ -5,6 +5,7 @@ import {
   Collapse,
   IconButton,
   InputBase,
+  type InputBaseProps,
   MenuItem,
   Paper,
   Select,
@@ -31,6 +32,28 @@ type Props = {
   onPresets: (presets: Preset[]) => void;
   onShowWeights: (show: boolean) => void;
 };
+
+type WeightInputProps = Omit<InputBaseProps, 'value' | 'onChange'> & {
+  value: number;
+  onValue: (weight: number) => void;
+};
+
+function WeightInput({ value, onValue, ...props }: WeightInputProps) {
+  const [draft, setDraft] = useState<string | null>(null);
+
+  return (
+    <InputBase
+      {...props}
+      type="number"
+      value={draft ?? value}
+      onChange={(event) => {
+        setDraft(event.target.value);
+        if (event.target.value !== '') onValue(Math.max(0, Number(event.target.value)));
+      }}
+      onBlur={() => setDraft(null)}
+    />
+  );
+}
 
 export default function OptionsPanel({
   options,
@@ -141,8 +164,7 @@ export default function OptionsPanel({
                 onChange={(event) => update(option.id, { label: event.target.value })}
               />
               {showWeights && (
-                <InputBase
-                  type="number"
+                <WeightInput
                   value={option.weight}
                   sx={{
                     width: 56,
@@ -154,9 +176,7 @@ export default function OptionsPanel({
                     },
                   }}
                   inputProps={{ min: 0, 'aria-label': `${t.weights} ${index + 1}` }}
-                  onChange={(event) =>
-                    update(option.id, { weight: Math.max(0, Number(event.target.value)) })
-                  }
+                  onValue={(weight) => update(option.id, { weight })}
                 />
               )}
               <IconButton
